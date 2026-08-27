@@ -2,19 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/database/database.dart';
+import '../../../core/database/database_provider.dart';
 import '../data/foods_dao.dart';
 import '../data/foods_repository.dart';
 
 part 'foods_providers.g.dart';
-
-/// Single app-wide database instance. `keepAlive` so it isn't torn down
-/// between screens. This is DI: everything downstream `watch`es it.
-@Riverpod(keepAlive: true)
-AppDatabase appDatabase(Ref ref) {
-  final db = AppDatabase();
-  ref.onDispose(db.close);
-  return db;
-}
 
 @Riverpod(keepAlive: true)
 FoodsRepository foodsRepository(Ref ref) {

@@ -1646,7 +1646,7 @@ class $PlanItemsTable extends PlanItems
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES plans (id)',
+      'REFERENCES plans (id) ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _foodIdMeta = const VerificationMeta('foodId');
@@ -2168,6 +2168,16 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [foods, plans, planItems];
+  @override
+  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'plans',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('plan_items', kind: UpdateKind.delete)],
+    ),
+  ]);
 }
 
 typedef $$FoodsTableCreateCompanionBuilder = FoodsCompanion Function({

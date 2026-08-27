@@ -13,4 +13,12 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   int get schemaVersion => 1;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        beforeOpen: (details) async {
+          // SQLite needs this enabled per connection; off by default.
+          await customStatement('PRAGMA foreign_keys = ON');
+        },
+      );
 }

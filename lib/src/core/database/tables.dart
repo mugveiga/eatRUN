@@ -45,7 +45,8 @@ class Plans extends Table with SyncColumns {
 
 /// One consumption on a plan's 0 → [Plans.length] timeline.
 class PlanItems extends Table with SyncColumns {
-  TextColumn get planId => text().references(Plans, #id)();
+  TextColumn get planId =>
+      text().references(Plans, #id, onDelete: KeyAction.cascade)();
   TextColumn get foodId => text().references(Foods, #id)();
 
   /// Position on the timeline, in the plan's unit (km or minutes).

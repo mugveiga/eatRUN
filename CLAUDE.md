@@ -100,6 +100,9 @@ No hardcoded user-facing strings. Uses Flutter's official gen-l10n pipeline:
 ## Status
 
 - ✅ Foods feature (list, add/edit with photo, soft delete) — the reference vertical slice.
-- ⬜ Plans feature (create plan, match foods onto a timeline, post-run comment).
+- ◻ Plans: data layer done (`PlansDao`, `PlansRepository`, providers, DAO test). UI pending —
+  create-plan form, food→timeline matching, plan detail.
+- Shared `appDatabaseProvider` lives in `core/database/database_provider.dart` (both features
+  depend on core, never on each other).
 - ⬜ Google login + backend sync.
 - ⬜ Dashboard (carbs/sodium/caffeine per hour across past plans).
