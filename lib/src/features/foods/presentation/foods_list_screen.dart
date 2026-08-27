@@ -27,6 +27,9 @@ class FoodsListScreen extends ConsumerWidget {
             return const _EmptyState();
           }
           return ListView.separated(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.viewPaddingOf(context).bottom,
+            ),
             itemCount: items.length,
             separatorBuilder: (_, _) => const Divider(height: 1),
             itemBuilder: (context, i) => _FoodTile(food: items[i]),

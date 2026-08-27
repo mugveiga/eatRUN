@@ -12,7 +12,13 @@ flutter test                                  # unit + widget tests
 dart run build_runner build                   # regenerate Drift + Riverpod code
 dart run build_runner watch                   # regenerate on save
 flutter gen-l10n                               # regenerate AppLocalizations from ARB
+dart run flutter_launcher_icons                # regenerate launcher icons from assets/icon
+dart run flutter_native_splash:create          # regenerate splash screens
 ```
+
+Icon/splash source art lives in `assets/icon/` (`app_icon.svg` full, `app_icon_foreground.svg`
+for Android adaptive). Edit the SVG → `rsvg-convert -w 1024 -h 1024 x.svg -o x.png` → rerun the
+two generators above. Config is in `pubspec.yaml` (`flutter_launcher_icons:` / `flutter_native_splash:`).
 
 Run `build_runner` after touching any Drift table/DAO or any `@riverpod` provider.
 

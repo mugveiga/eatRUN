@@ -60,6 +60,8 @@ dev_dependencies:
   build_runner: ^2.16.0
   riverpod_generator: ^4.0.0
   drift_dev: ^2.34.5
+  flutter_launcher_icons: ^0.14.0
+  flutter_native_splash: ^2.2.16
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -105,3 +107,19 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# Launcher icon generation — run: dart run flutter_launcher_icons
+flutter_launcher_icons:
+  image_path: "assets/icon/app_icon.png"
+  android: true
+  ios: true
+  adaptive_icon_background: "#FF5722"
+  adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"
+
+# Splash screen generation — run: dart run flutter_native_splash:create
+flutter_native_splash:
+  color: "#FF5722"
+  image: assets/icon/app_icon_foreground.png
+  android_12:
+    color: "#FF5722"
+    image: assets/icon/app_icon_foreground.png
