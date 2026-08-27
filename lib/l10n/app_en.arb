@@ -35,5 +35,22 @@
   "fieldNotes": "Notes",
   "save": "Save",
   "takePhoto": "Take photo",
-  "chooseFromGallery": "Choose from gallery"
+  "chooseFromGallery": "Choose from gallery",
+
+  "navFoods": "Foods",
+  "navPlans": "Plans",
+  "myPlans": "My Plans",
+  "noPlansYet": "No plans yet.\nPlan a run or ride to see it here.",
+  "planDistanceKm": "{km} km",
+  "@planDistanceKm": {
+    "placeholders": {
+      "km": { "type": "String" }
+    }
+  },
+  "planDurationMin": "{minutes} min",
+  "@planDurationMin": {
+    "placeholders": {
+      "minutes": { "type": "String" }
+    }
+  }
 }

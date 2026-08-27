@@ -100,8 +100,11 @@ No hardcoded user-facing strings. Uses Flutter's official gen-l10n pipeline:
 ## Status
 
 - ✅ Foods feature (list, add/edit with photo, soft delete) — the reference vertical slice.
-- ◻ Plans: data layer done (`PlansDao`, `PlansRepository`, providers, DAO test). UI pending —
-  create-plan form, food→timeline matching, plan detail.
+- ◻ Plans: data layer + list screen done. UI pending — create-plan form (no FAB yet),
+  food→timeline matching, plan detail (tiles have no onTap yet).
+- App opens into a bottom-nav shell (`core/router/app_shell.dart`) via
+  `StatefulShellRoute.indexedStack` — Foods + Plans branches, each keeping its own stack.
+  Food add/edit pushes full-screen over the shell (root navigator key).
 - Shared `appDatabaseProvider` lives in `core/database/database_provider.dart` (both features
   depend on core, never on each other).
 - ⬜ Google login + backend sync.
