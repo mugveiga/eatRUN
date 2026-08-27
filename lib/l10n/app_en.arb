@@ -1,0 +1,31 @@
+{
+  "@@locale": "en",
+
+  "myFoods": "My Foods",
+  "addFood": "Add food",
+  "noFoodsYet": "No foods yet.\nAdd the gels, drinks and snacks you fuel with.",
+  "genericError": "Error: {message}",
+  "@genericError": {
+    "placeholders": {
+      "message": { "type": "String" }
+    }
+  },
+  "foodNutrition": "{carbs}g carbs · {sodium}mg sodium · {caffeine}mg caffeine",
+  "@foodNutrition": {
+    "placeholders": {
+      "carbs": { "type": "String" },
+      "sodium": { "type": "String" },
+      "caffeine": { "type": "String" }
+    }
+  },
+
+  "newFood": "New food",
+  "editFood": "Edit food",
+  "fieldName": "Name",
+  "fieldRequired": "Required",
+  "fieldCarbs": "Carbs (g)",
+  "fieldSodium": "Sodium (mg)",
+  "fieldCaffeine": "Caffeine (mg)",
+  "fieldNotes": "Notes",
+  "save": "Save"
+}

@@ -11,6 +11,7 @@ flutter analyze                               # lint (must be clean)
 flutter test                                  # unit + widget tests
 dart run build_runner build                   # regenerate Drift + Riverpod code
 dart run build_runner watch                   # regenerate on save
+flutter gen-l10n                               # regenerate AppLocalizations from ARB
 ```
 
 Run `build_runner` after touching any Drift table/DAO or any `@riverpod` provider.
@@ -54,6 +55,16 @@ so today's local-only code doesn't depend on the choice.
 
 Tables: `Foods`, `Plans` (distance- or duration-bounded, per-hour targets), `PlanItems`
 (one consumption on the 0→end timeline, links a Plan to a Food).
+
+## Localization
+
+No hardcoded user-facing strings. Uses Flutter's official gen-l10n pipeline:
+- Strings live in `lib/l10n/app_en.arb` (add a key, run `flutter gen-l10n`; it also
+  regenerates on `flutter run`/build via `generate: true` in pubspec).
+- Config in `l10n.yaml`; generated `AppLocalizations` lands in `lib/l10n/`.
+- In widgets: `final l10n = AppLocalizations.of(context)!;` then `l10n.myFoods`.
+  Placeholders are typed params, e.g. `l10n.foodNutrition(carbs, sodium, caffeine)`.
+- Add a language later by dropping in `app_pt.arb` — nothing else changes.
 
 ## Conventions & gotchas
 

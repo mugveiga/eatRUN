@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:eatrun/l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'foods_providers.dart';
@@ -88,8 +89,9 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
         body: Center(child: CircularProgressIndicator()),
       );
     }
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: Text(_isEditing ? 'Edit food' : 'New food')),
+      appBar: AppBar(title: Text(_isEditing ? l10n.editFood : l10n.newFood)),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -109,20 +111,20 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
             const SizedBox(height: 24),
             TextFormField(
               controller: _name,
-              decoration: const InputDecoration(labelText: 'Name'),
+              decoration: InputDecoration(labelText: l10n.fieldName),
               validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Required' : null,
+                  (v == null || v.trim().isEmpty) ? l10n.fieldRequired : null,
             ),
-            _NumberField(controller: _carbs, label: 'Carbs (g)'),
-            _NumberField(controller: _sodium, label: 'Sodium (mg)'),
-            _NumberField(controller: _caffeine, label: 'Caffeine (mg)'),
+            _NumberField(controller: _carbs, label: l10n.fieldCarbs),
+            _NumberField(controller: _sodium, label: l10n.fieldSodium),
+            _NumberField(controller: _caffeine, label: l10n.fieldCaffeine),
             TextFormField(
               controller: _notes,
-              decoration: const InputDecoration(labelText: 'Notes'),
+              decoration: InputDecoration(labelText: l10n.fieldNotes),
               maxLines: 3,
             ),
             const SizedBox(height: 24),
-            FilledButton(onPressed: _save, child: const Text('Save')),
+            FilledButton(onPressed: _save, child: Text(l10n.save)),
           ],
         ),
       ),

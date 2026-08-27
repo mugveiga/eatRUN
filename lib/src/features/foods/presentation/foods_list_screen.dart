@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:eatrun/l10n/app_localizations.dart';
+
 import '../../../core/database/database.dart';
 import 'foods_providers.dart';
 
@@ -12,12 +14,13 @@ class FoodsListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final foods = ref.watch(foodsListProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('My Foods')),
+      appBar: AppBar(title: Text(l10n.myFoods)),
       body: foods.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(child: Text(l10n.genericError(e.toString()))),
         data: (items) {
           if (items.isEmpty) {
             return const _EmptyState();
@@ -32,7 +35,7 @@ class FoodsListScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/foods/new'),
         icon: const Icon(Icons.add),
-        label: const Text('Add food'),
+        label: Text(l10n.addFood),
       ),
     );
   }
@@ -45,13 +48,16 @@ class _FoodTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return ListTile(
       leading: _Thumbnail(path: food.photoPath),
       title: Text(food.name),
       subtitle: Text(
-        '${food.carbsGrams.toStringAsFixed(0)}g carbs · '
-        '${food.sodiumMg.toStringAsFixed(0)}mg sodium · '
-        '${food.caffeineMg.toStringAsFixed(0)}mg caffeine',
+        l10n.foodNutrition(
+          food.carbsGrams.toStringAsFixed(0),
+          food.sodiumMg.toStringAsFixed(0),
+          food.caffeineMg.toStringAsFixed(0),
+        ),
       ),
       onTap: () => context.push('/foods/${food.id}'),
       trailing: IconButton(
@@ -82,11 +88,11 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(32),
+        padding: const EdgeInsets.all(32),
         child: Text(
-          'No foods yet.\nAdd the gels, drinks and snacks you fuel with.',
+          AppLocalizations.of(context)!.noFoodsYet,
           textAlign: TextAlign.center,
         ),
       ),
