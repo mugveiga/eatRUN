@@ -23,9 +23,9 @@ class FoodsRepository {
     String? id,
     required String name,
     String? photoPath,
-    double carbsGrams = 0,
-    double sodiumMg = 0,
-    double caffeineMg = 0,
+    int carbsGrams = 0,
+    int sodiumMg = 0,
+    int caffeineMg = 0,
     String? notes,
   }) {
     return _dao.upsert(

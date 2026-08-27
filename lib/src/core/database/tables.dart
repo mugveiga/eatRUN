@@ -9,9 +9,9 @@ enum PlanType { distance, duration }
 class Foods extends Table with SyncColumns {
   TextColumn get name => text().withLength(min: 1, max: 120)();
   TextColumn get photoPath => text().nullable()();
-  RealColumn get carbsGrams => real().withDefault(const Constant(0))();
-  RealColumn get sodiumMg => real().withDefault(const Constant(0))();
-  RealColumn get caffeineMg => real().withDefault(const Constant(0))();
+  IntColumn get carbsGrams => integer().withDefault(const Constant(0))();
+  IntColumn get sodiumMg => integer().withDefault(const Constant(0))();
+  IntColumn get caffeineMg => integer().withDefault(const Constant(0))();
   TextColumn get notes => text().nullable()();
 }
 

@@ -1,0 +1,2 @@
+# Collapse generated code in diffs and exclude it from language stats.
+*.g.dart linguist-generated=true

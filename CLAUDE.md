@@ -56,6 +56,13 @@ so today's local-only code doesn't depend on the choice.
 Tables: `Foods`, `Plans` (distance- or duration-bounded, per-hour targets), `PlanItems`
 (one consumption on the 0→end timeline, links a Plan to a Food).
 
+## Styling tokens
+
+No magic numbers for layout. Paddings/gaps use the 8-pt scale in
+`core/theme/app_spacing.dart` (`AppSpacing.md` etc.); one-off component dimensions
+(avatar radius, icon size) use `core/theme/app_sizes.dart` (`AppSizes.*`). Colors always
+come from the `Theme`/`ColorScheme`, never hardcoded.
+
 ## Localization
 
 No hardcoded user-facing strings. Uses Flutter's official gen-l10n pipeline:

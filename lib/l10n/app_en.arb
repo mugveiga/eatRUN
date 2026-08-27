@@ -23,9 +23,17 @@
   "editFood": "Edit food",
   "fieldName": "Name",
   "fieldRequired": "Required",
+  "fieldMaxValue": "Enter a value up to {max}",
+  "@fieldMaxValue": {
+    "placeholders": {
+      "max": { "type": "int" }
+    }
+  },
   "fieldCarbs": "Carbs (g)",
   "fieldSodium": "Sodium (mg)",
   "fieldCaffeine": "Caffeine (mg)",
   "fieldNotes": "Notes",
-  "save": "Save"
+  "save": "Save",
+  "takePhoto": "Take photo",
+  "chooseFromGallery": "Choose from gallery"
 }

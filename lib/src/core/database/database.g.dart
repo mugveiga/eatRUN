@@ -86,11 +86,11 @@ class $FoodsTable extends Foods with TableInfo<$FoodsTable, Food> {
     'carbsGrams',
   );
   @override
-  late final GeneratedColumn<double> carbsGrams = GeneratedColumn<double>(
+  late final GeneratedColumn<int> carbsGrams = GeneratedColumn<int>(
     'carbs_grams',
     aliasedName,
     false,
-    type: DriftSqlType.double,
+    type: DriftSqlType.int,
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
@@ -98,11 +98,11 @@ class $FoodsTable extends Foods with TableInfo<$FoodsTable, Food> {
     'sodiumMg',
   );
   @override
-  late final GeneratedColumn<double> sodiumMg = GeneratedColumn<double>(
+  late final GeneratedColumn<int> sodiumMg = GeneratedColumn<int>(
     'sodium_mg',
     aliasedName,
     false,
-    type: DriftSqlType.double,
+    type: DriftSqlType.int,
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
@@ -110,11 +110,11 @@ class $FoodsTable extends Foods with TableInfo<$FoodsTable, Food> {
     'caffeineMg',
   );
   @override
-  late final GeneratedColumn<double> caffeineMg = GeneratedColumn<double>(
+  late final GeneratedColumn<int> caffeineMg = GeneratedColumn<int>(
     'caffeine_mg',
     aliasedName,
     false,
-    type: DriftSqlType.double,
+    type: DriftSqlType.int,
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
@@ -256,15 +256,15 @@ class $FoodsTable extends Foods with TableInfo<$FoodsTable, Food> {
         data['${effectivePrefix}photo_path'],
       ),
       carbsGrams: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
+        DriftSqlType.int,
         data['${effectivePrefix}carbs_grams'],
       )!,
       sodiumMg: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
+        DriftSqlType.int,
         data['${effectivePrefix}sodium_mg'],
       )!,
       caffeineMg: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
+        DriftSqlType.int,
         data['${effectivePrefix}caffeine_mg'],
       )!,
       notes: attachedDatabase.typeMapping.read(
@@ -291,9 +291,9 @@ class Food extends DataClass implements Insertable<Food> {
   final String? userId;
   final String name;
   final String? photoPath;
-  final double carbsGrams;
-  final double sodiumMg;
-  final double caffeineMg;
+  final int carbsGrams;
+  final int sodiumMg;
+  final int caffeineMg;
   final String? notes;
   const Food({
     required this.id,
@@ -328,9 +328,9 @@ class Food extends DataClass implements Insertable<Food> {
     if (!nullToAbsent || photoPath != null) {
       map['photo_path'] = Variable<String>(photoPath);
     }
-    map['carbs_grams'] = Variable<double>(carbsGrams);
-    map['sodium_mg'] = Variable<double>(sodiumMg);
-    map['caffeine_mg'] = Variable<double>(caffeineMg);
+    map['carbs_grams'] = Variable<int>(carbsGrams);
+    map['sodium_mg'] = Variable<int>(sodiumMg);
+    map['caffeine_mg'] = Variable<int>(caffeineMg);
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
     }
@@ -376,9 +376,9 @@ class Food extends DataClass implements Insertable<Food> {
       userId: serializer.fromJson<String?>(json['userId']),
       name: serializer.fromJson<String>(json['name']),
       photoPath: serializer.fromJson<String?>(json['photoPath']),
-      carbsGrams: serializer.fromJson<double>(json['carbsGrams']),
-      sodiumMg: serializer.fromJson<double>(json['sodiumMg']),
-      caffeineMg: serializer.fromJson<double>(json['caffeineMg']),
+      carbsGrams: serializer.fromJson<int>(json['carbsGrams']),
+      sodiumMg: serializer.fromJson<int>(json['sodiumMg']),
+      caffeineMg: serializer.fromJson<int>(json['caffeineMg']),
       notes: serializer.fromJson<String?>(json['notes']),
     );
   }
@@ -395,9 +395,9 @@ class Food extends DataClass implements Insertable<Food> {
       'userId': serializer.toJson<String?>(userId),
       'name': serializer.toJson<String>(name),
       'photoPath': serializer.toJson<String?>(photoPath),
-      'carbsGrams': serializer.toJson<double>(carbsGrams),
-      'sodiumMg': serializer.toJson<double>(sodiumMg),
-      'caffeineMg': serializer.toJson<double>(caffeineMg),
+      'carbsGrams': serializer.toJson<int>(carbsGrams),
+      'sodiumMg': serializer.toJson<int>(sodiumMg),
+      'caffeineMg': serializer.toJson<int>(caffeineMg),
       'notes': serializer.toJson<String?>(notes),
     };
   }
@@ -410,9 +410,9 @@ class Food extends DataClass implements Insertable<Food> {
     Value<String?> userId = const Value.absent(),
     String? name,
     Value<String?> photoPath = const Value.absent(),
-    double? carbsGrams,
-    double? sodiumMg,
-    double? caffeineMg,
+    int? carbsGrams,
+    int? sodiumMg,
+    int? caffeineMg,
     Value<String?> notes = const Value.absent(),
   }) => Food(
     id: id ?? this.id,
@@ -506,9 +506,9 @@ class FoodsCompanion extends UpdateCompanion<Food> {
   final Value<String?> userId;
   final Value<String> name;
   final Value<String?> photoPath;
-  final Value<double> carbsGrams;
-  final Value<double> sodiumMg;
-  final Value<double> caffeineMg;
+  final Value<int> carbsGrams;
+  final Value<int> sodiumMg;
+  final Value<int> caffeineMg;
   final Value<String?> notes;
   final Value<int> rowid;
   const FoodsCompanion({
@@ -549,9 +549,9 @@ class FoodsCompanion extends UpdateCompanion<Food> {
     Expression<String>? userId,
     Expression<String>? name,
     Expression<String>? photoPath,
-    Expression<double>? carbsGrams,
-    Expression<double>? sodiumMg,
-    Expression<double>? caffeineMg,
+    Expression<int>? carbsGrams,
+    Expression<int>? sodiumMg,
+    Expression<int>? caffeineMg,
     Expression<String>? notes,
     Expression<int>? rowid,
   }) {
@@ -579,9 +579,9 @@ class FoodsCompanion extends UpdateCompanion<Food> {
     Value<String?>? userId,
     Value<String>? name,
     Value<String?>? photoPath,
-    Value<double>? carbsGrams,
-    Value<double>? sodiumMg,
-    Value<double>? caffeineMg,
+    Value<int>? carbsGrams,
+    Value<int>? sodiumMg,
+    Value<int>? caffeineMg,
     Value<String?>? notes,
     Value<int>? rowid,
   }) {
@@ -628,13 +628,13 @@ class FoodsCompanion extends UpdateCompanion<Food> {
       map['photo_path'] = Variable<String>(photoPath.value);
     }
     if (carbsGrams.present) {
-      map['carbs_grams'] = Variable<double>(carbsGrams.value);
+      map['carbs_grams'] = Variable<int>(carbsGrams.value);
     }
     if (sodiumMg.present) {
-      map['sodium_mg'] = Variable<double>(sodiumMg.value);
+      map['sodium_mg'] = Variable<int>(sodiumMg.value);
     }
     if (caffeineMg.present) {
-      map['caffeine_mg'] = Variable<double>(caffeineMg.value);
+      map['caffeine_mg'] = Variable<int>(caffeineMg.value);
     }
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
@@ -2178,9 +2178,9 @@ typedef $$FoodsTableCreateCompanionBuilder = FoodsCompanion Function({
   Value<String?> userId,
   required String name,
   Value<String?> photoPath,
-  Value<double> carbsGrams,
-  Value<double> sodiumMg,
-  Value<double> caffeineMg,
+  Value<int> carbsGrams,
+  Value<int> sodiumMg,
+  Value<int> caffeineMg,
   Value<String?> notes,
   Value<int> rowid,
 });
@@ -2192,9 +2192,9 @@ typedef $$FoodsTableUpdateCompanionBuilder = FoodsCompanion Function({
   Value<String?> userId,
   Value<String> name,
   Value<String?> photoPath,
-  Value<double> carbsGrams,
-  Value<double> sodiumMg,
-  Value<double> caffeineMg,
+  Value<int> carbsGrams,
+  Value<int> sodiumMg,
+  Value<int> caffeineMg,
   Value<String?> notes,
   Value<int> rowid,
 });
@@ -2266,17 +2266,17 @@ class $$FoodsTableFilterComposer extends Composer<_$AppDatabase, $FoodsTable> {
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<double> get carbsGrams => $composableBuilder(
+  ColumnFilters<int> get carbsGrams => $composableBuilder(
     column: $table.carbsGrams,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<double> get sodiumMg => $composableBuilder(
+  ColumnFilters<int> get sodiumMg => $composableBuilder(
     column: $table.sodiumMg,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<double> get caffeineMg => $composableBuilder(
+  ColumnFilters<int> get caffeineMg => $composableBuilder(
     column: $table.caffeineMg,
     builder: (column) => ColumnFilters(column),
   );
@@ -2356,17 +2356,17 @@ class $$FoodsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<double> get carbsGrams => $composableBuilder(
+  ColumnOrderings<int> get carbsGrams => $composableBuilder(
     column: $table.carbsGrams,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<double> get sodiumMg => $composableBuilder(
+  ColumnOrderings<int> get sodiumMg => $composableBuilder(
     column: $table.sodiumMg,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<double> get caffeineMg => $composableBuilder(
+  ColumnOrderings<int> get caffeineMg => $composableBuilder(
     column: $table.caffeineMg,
     builder: (column) => ColumnOrderings(column),
   );
@@ -2410,15 +2410,15 @@ class $$FoodsTableAnnotationComposer
   GeneratedColumn<String> get photoPath =>
       $composableBuilder(column: $table.photoPath, builder: (column) => column);
 
-  GeneratedColumn<double> get carbsGrams => $composableBuilder(
+  GeneratedColumn<int> get carbsGrams => $composableBuilder(
     column: $table.carbsGrams,
     builder: (column) => column,
   );
 
-  GeneratedColumn<double> get sodiumMg =>
+  GeneratedColumn<int> get sodiumMg =>
       $composableBuilder(column: $table.sodiumMg, builder: (column) => column);
 
-  GeneratedColumn<double> get caffeineMg => $composableBuilder(
+  GeneratedColumn<int> get caffeineMg => $composableBuilder(
     column: $table.caffeineMg,
     builder: (column) => column,
   );
@@ -2487,9 +2487,9 @@ class $$FoodsTableTableManager
                 Value<String?> userId = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String?> photoPath = const Value.absent(),
-                Value<double> carbsGrams = const Value.absent(),
-                Value<double> sodiumMg = const Value.absent(),
-                Value<double> caffeineMg = const Value.absent(),
+                Value<int> carbsGrams = const Value.absent(),
+                Value<int> sodiumMg = const Value.absent(),
+                Value<int> caffeineMg = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => FoodsCompanion(
@@ -2515,9 +2515,9 @@ class $$FoodsTableTableManager
                 Value<String?> userId = const Value.absent(),
                 required String name,
                 Value<String?> photoPath = const Value.absent(),
-                Value<double> carbsGrams = const Value.absent(),
-                Value<double> sodiumMg = const Value.absent(),
-                Value<double> caffeineMg = const Value.absent(),
+                Value<int> carbsGrams = const Value.absent(),
+                Value<int> sodiumMg = const Value.absent(),
+                Value<int> caffeineMg = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => FoodsCompanion.insert(

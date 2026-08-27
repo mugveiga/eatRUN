@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:eatrun/l10n/app_localizations.dart';
 
 import '../../../core/database/database.dart';
+import '../../../core/theme/app_spacing.dart';
 import 'foods_providers.dart';
 
 class FoodsListScreen extends ConsumerWidget {
@@ -54,9 +55,9 @@ class _FoodTile extends ConsumerWidget {
       title: Text(food.name),
       subtitle: Text(
         l10n.foodNutrition(
-          food.carbsGrams.toStringAsFixed(0),
-          food.sodiumMg.toStringAsFixed(0),
-          food.caffeineMg.toStringAsFixed(0),
+          food.carbsGrams.toString(),
+          food.sodiumMg.toString(),
+          food.caffeineMg.toString(),
         ),
       ),
       onTap: () => context.push('/foods/${food.id}'),
@@ -90,7 +91,7 @@ class _EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         child: Text(
           AppLocalizations.of(context)!.noFoodsYet,
           textAlign: TextAlign.center,
