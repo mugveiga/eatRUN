@@ -2,8 +2,13 @@ import 'package:drift/drift.dart';
 
 import 'sync.dart';
 
-/// Whether a plan is bounded by distance or by time.
+/// How intake is tracked along the plan: by distance or by time. Chosen at
+/// the food-matching step, so nullable on the plan until then.
 enum PlanType { distance, duration }
+
+/// The kind of workout. Drives whether the third pace control is min/km (run)
+/// or km/h (bike).
+enum ActivityType { run, bike }
 
 /// A food/gel/drink the user can consume. Nutrition is per single serving.
 class Foods extends Table with SyncColumns {
@@ -19,31 +24,28 @@ class Foods extends Table with SyncColumns {
 class Plans extends Table with SyncColumns {
   TextColumn get name => text().withLength(min: 1, max: 120)();
   DateTimeColumn get date => dateTime()();
-  IntColumn get planType => intEnum<PlanType>()();
+  IntColumn get activityType => intEnum<ActivityType>()();
 
-  /// The plan's extent, read in [planType]'s unit: km for distance,
-  /// minutes for duration.
-  RealColumn get length => real()();
+  /// Both are always set; pace/speed is derived from them (distance ÷ time).
+  RealColumn get distanceKm => real()();
+  IntColumn get durationMinutes => integer()();
 
   RealColumn get targetCarbsPerHour => real().withDefault(const Constant(0))();
   RealColumn get targetSodiumPerHour => real().withDefault(const Constant(0))();
   RealColumn get targetCaffeinePerHour =>
       real().withDefault(const Constant(0))();
 
-  /// Planned gap between intakes, in the plan's unit (km or minutes).
-  /// Null if there's no fixed gap.
-  RealColumn get intakeInterval => real().nullable()();
+  /// Intake-tracking mode, chosen at the matching step (null until then).
+  IntColumn get planType => intEnum<PlanType>().nullable()();
 
-  /// For a distance plan, bridges km → time so the per-hour targets can be
-  /// computed. Null for a duration plan (length is already time). The UI can
-  /// let the user enter this as pace (min/km) or speed (km/h) and convert.
-  IntColumn get expectedDurationMinutes => integer().nullable()();
+  /// Planned gap between intakes, in [planType]'s unit. Set at matching.
+  RealColumn get intakeInterval => real().nullable()();
 
   /// Free-text notes, before or after the activity.
   TextColumn get comments => text().nullable()();
 }
 
-/// One consumption on a plan's 0 → [Plans.length] timeline.
+/// One consumption on a plan's timeline (0 → distance or duration).
 class PlanItems extends Table with SyncColumns {
   TextColumn get planId =>
       text().references(Plans, #id, onDelete: KeyAction.cascade)();

@@ -49,7 +49,9 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
   }
 
   Future<void> _load() async {
-    final food = await ref.read(foodsRepositoryProvider).findById(widget.foodId!);
+    final food = await ref
+        .read(foodsRepositoryProvider)
+        .findById(widget.foodId!);
     if (food != null) {
       _name.text = food.name;
       _carbs.text = food.carbsGrams.toString();
@@ -101,7 +103,9 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-    await ref.read(foodsRepositoryProvider).save(
+    await ref
+        .read(foodsRepositoryProvider)
+        .save(
           id: widget.foodId,
           name: _name.text.trim(),
           photoPath: _photoPath,
@@ -116,74 +120,70 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
   @override
   Widget build(BuildContext context) {
     if (!_loaded) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(title: Text(_isEditing ? l10n.editFood : l10n.newFood)),
       body: Form(
         key: _formKey,
-        child: ListView(
-          padding: EdgeInsets.fromLTRB(
-            AppSpacing.md,
-            AppSpacing.md,
-            AppSpacing.md,
-            AppSpacing.md + MediaQuery.viewPaddingOf(context).bottom,
-          ),
-          children: [
-            GestureDetector(
-              onTap: _pickPhoto,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(AppSpacing.md),
-                child: AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: ColoredBox(
-                    color:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
-                    child: _photoPath != null
-                        ? Image.file(File(_photoPath!), fit: BoxFit.fitWidth)
-                        : const Center(
-                            child: Icon(
-                              Icons.add_a_photo,
-                              size: AppSizes.iconSize,
+        child: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            children: [
+              GestureDetector(
+                onTap: _pickPhoto,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(AppSpacing.md),
+                  child: AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: ColoredBox(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest,
+                      child: _photoPath != null
+                          ? Image.file(File(_photoPath!), fit: BoxFit.fitWidth)
+                          : const Center(
+                              child: Icon(
+                                Icons.add_a_photo,
+                                size: AppSizes.iconSize,
+                              ),
                             ),
-                          ),
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            TextFormField(
-              controller: _name,
-              decoration: InputDecoration(labelText: l10n.fieldName),
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? l10n.fieldRequired : null,
-            ),
-            _NumberField(
-              controller: _carbs,
-              label: l10n.fieldCarbs,
-              max: _maxCarbs,
-            ),
-            _NumberField(
-              controller: _sodium,
-              label: l10n.fieldSodium,
-              max: _maxSodium,
-            ),
-            _NumberField(
-              controller: _caffeine,
-              label: l10n.fieldCaffeine,
-              max: _maxCaffeine,
-            ),
-            TextFormField(
-              controller: _notes,
-              decoration: InputDecoration(labelText: l10n.fieldNotes),
-              maxLines: 3,
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            FilledButton(onPressed: _save, child: Text(l10n.save)),
-          ],
+              const SizedBox(height: AppSpacing.lg),
+              TextFormField(
+                controller: _name,
+                decoration: InputDecoration(labelText: l10n.fieldName),
+                validator: (v) =>
+                    (v == null || v.trim().isEmpty) ? l10n.fieldRequired : null,
+              ),
+              _NumberField(
+                controller: _carbs,
+                label: l10n.fieldCarbs,
+                max: _maxCarbs,
+              ),
+              _NumberField(
+                controller: _sodium,
+                label: l10n.fieldSodium,
+                max: _maxSodium,
+              ),
+              _NumberField(
+                controller: _caffeine,
+                label: l10n.fieldCaffeine,
+                max: _maxCaffeine,
+              ),
+              TextFormField(
+                controller: _notes,
+                decoration: InputDecoration(labelText: l10n.fieldNotes),
+                maxLines: 3,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              FilledButton(onPressed: _save, child: Text(l10n.save)),
+            ],
+          ),
         ),
       ),
     );

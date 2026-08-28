@@ -1,6 +1,7 @@
 import 'package:eatrun/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/database/database.dart';
@@ -34,6 +35,12 @@ class PlansListScreen extends ConsumerWidget {
           );
         },
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'plansFab',
+        onPressed: () => context.push('/plans/new'),
+        icon: const Icon(Icons.add),
+        label: Text(l10n.addPlan),
+      ),
     );
   }
 }
@@ -47,14 +54,14 @@ class _PlanTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final date = DateFormat.yMMMd().format(plan.date);
-    final length = _formatNum(plan.length);
-    final lengthLabel = plan.planType == PlanType.distance
-        ? l10n.planDistanceKm(length)
-        : l10n.planDurationMin(length);
+    final distance = l10n.planDistanceKm(_formatNum(plan.distanceKm));
+    final icon = plan.activityType == ActivityType.bike
+        ? Icons.directions_bike
+        : Icons.directions_run;
     return ListTile(
-      leading: const CircleAvatar(child: Icon(Icons.event_note)),
+      leading: CircleAvatar(child: Icon(icon)),
       title: Text(plan.name),
-      subtitle: Text('$date · $lengthLabel'),
+      subtitle: Text('$date · $distance'),
       trailing: IconButton(
         icon: const Icon(Icons.delete_outline),
         onPressed: () => ref.read(plansRepositoryProvider).deletePlan(plan.id),

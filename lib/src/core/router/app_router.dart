@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/foods/presentation/food_form_screen.dart';
 import '../../features/foods/presentation/foods_list_screen.dart';
+import '../../features/plans/presentation/plan_form_screen.dart';
 import '../../features/plans/presentation/plans_list_screen.dart';
 import 'app_shell.dart';
 
@@ -43,6 +44,13 @@ final appRouter = GoRouter(
             GoRoute(
               path: '/plans',
               builder: (context, state) => const PlansListScreen(),
+              routes: [
+                GoRoute(
+                  path: 'new',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) => const PlanFormScreen(),
+                ),
+              ],
             ),
           ],
         ),

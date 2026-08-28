@@ -52,5 +52,24 @@
     "placeholders": {
       "minutes": { "type": "String" }
     }
-  }
+  },
+
+  "addPlan": "Add plan",
+  "newPlan": "New plan",
+  "activityRun": "Run",
+  "activityBike": "Bike",
+  "typeDistance": "Distance",
+  "typeDuration": "Duration",
+  "planDate": "Date",
+  "planLengthDistance": "Distance (km)",
+  "planLengthDuration": "Duration (min)",
+  "planExpectedDuration": "Expected duration (min)",
+  "planExpectedDurationHelp": "Lets us turn distance into time for per-hour targets",
+  "targetsPerHour": "Targets per hour",
+  "targetCarbs": "Carbs (g/h)",
+  "targetSodium": "Sodium (mg/h)",
+  "targetCaffeine": "Caffeine (mg/h)",
+  "planIntakeIntervalDistance": "Intake interval (km)",
+  "planIntakeIntervalDuration": "Intake interval (min)",
+  "planComments": "Comments"
 }

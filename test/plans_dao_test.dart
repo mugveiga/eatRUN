@@ -23,8 +23,9 @@ void main() {
     final planId = await repo.savePlan(
       name: 'Long run',
       date: DateTime(2026, 8, 30),
-      planType: PlanType.distance,
-      length: 30,
+      activityType: ActivityType.run,
+      distanceKm: 30,
+      durationMinutes: 150,
       targetCarbsPerHour: 60,
     );
     await repo.saveItem(planId: planId, foodId: 'food-1', offsetLength: 10);
@@ -32,7 +33,9 @@ void main() {
     final plans = await repo.watchPlans().first;
     expect(plans, hasLength(1));
     expect(plans.single.name, 'Long run');
-    expect(plans.single.planType, PlanType.distance);
+    expect(plans.single.activityType, ActivityType.run);
+    expect(plans.single.distanceKm, 30);
+    expect(plans.single.planType, isNull); // set later, at matching
 
     final items = await repo.watchItems(planId).first;
     expect(items, hasLength(1));

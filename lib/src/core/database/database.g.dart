@@ -743,21 +743,34 @@ class $PlansTable extends Plans with TableInfo<$PlansTable, Plan> {
     requiredDuringInsert: true,
   );
   @override
-  late final GeneratedColumnWithTypeConverter<PlanType, int> planType =
+  late final GeneratedColumnWithTypeConverter<ActivityType, int> activityType =
       GeneratedColumn<int>(
-        'plan_type',
+        'activity_type',
         aliasedName,
         false,
         type: DriftSqlType.int,
         requiredDuringInsert: true,
-      ).withConverter<PlanType>($PlansTable.$converterplanType);
-  static const VerificationMeta _lengthMeta = const VerificationMeta('length');
+      ).withConverter<ActivityType>($PlansTable.$converteractivityType);
+  static const VerificationMeta _distanceKmMeta = const VerificationMeta(
+    'distanceKm',
+  );
   @override
-  late final GeneratedColumn<double> length = GeneratedColumn<double>(
-    'length',
+  late final GeneratedColumn<double> distanceKm = GeneratedColumn<double>(
+    'distance_km',
     aliasedName,
     false,
     type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _durationMinutesMeta = const VerificationMeta(
+    'durationMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> durationMinutes = GeneratedColumn<int>(
+    'duration_minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _targetCarbsPerHourMeta =
@@ -796,6 +809,15 @@ class $PlansTable extends Plans with TableInfo<$PlansTable, Plan> {
         requiredDuringInsert: false,
         defaultValue: const Constant(0),
       );
+  @override
+  late final GeneratedColumnWithTypeConverter<PlanType?, int> planType =
+      GeneratedColumn<int>(
+        'plan_type',
+        aliasedName,
+        true,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+      ).withConverter<PlanType?>($PlansTable.$converterplanTypen);
   static const VerificationMeta _intakeIntervalMeta = const VerificationMeta(
     'intakeInterval',
   );
@@ -807,17 +829,6 @@ class $PlansTable extends Plans with TableInfo<$PlansTable, Plan> {
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _expectedDurationMinutesMeta =
-      const VerificationMeta('expectedDurationMinutes');
-  @override
-  late final GeneratedColumn<int> expectedDurationMinutes =
-      GeneratedColumn<int>(
-        'expected_duration_minutes',
-        aliasedName,
-        true,
-        type: DriftSqlType.int,
-        requiredDuringInsert: false,
-      );
   static const VerificationMeta _commentsMeta = const VerificationMeta(
     'comments',
   );
@@ -838,13 +849,14 @@ class $PlansTable extends Plans with TableInfo<$PlansTable, Plan> {
     userId,
     name,
     date,
-    planType,
-    length,
+    activityType,
+    distanceKm,
+    durationMinutes,
     targetCarbsPerHour,
     targetSodiumPerHour,
     targetCaffeinePerHour,
+    planType,
     intakeInterval,
-    expectedDurationMinutes,
     comments,
   ];
   @override
@@ -900,13 +912,24 @@ class $PlansTable extends Plans with TableInfo<$PlansTable, Plan> {
     } else if (isInserting) {
       context.missing(_dateMeta);
     }
-    if (data.containsKey('length')) {
+    if (data.containsKey('distance_km')) {
       context.handle(
-        _lengthMeta,
-        length.isAcceptableOrUnknown(data['length']!, _lengthMeta),
+        _distanceKmMeta,
+        distanceKm.isAcceptableOrUnknown(data['distance_km']!, _distanceKmMeta),
       );
     } else if (isInserting) {
-      context.missing(_lengthMeta);
+      context.missing(_distanceKmMeta);
+    }
+    if (data.containsKey('duration_minutes')) {
+      context.handle(
+        _durationMinutesMeta,
+        durationMinutes.isAcceptableOrUnknown(
+          data['duration_minutes']!,
+          _durationMinutesMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_durationMinutesMeta);
     }
     if (data.containsKey('target_carbs_per_hour')) {
       context.handle(
@@ -941,15 +964,6 @@ class $PlansTable extends Plans with TableInfo<$PlansTable, Plan> {
         intakeInterval.isAcceptableOrUnknown(
           data['intake_interval']!,
           _intakeIntervalMeta,
-        ),
-      );
-    }
-    if (data.containsKey('expected_duration_minutes')) {
-      context.handle(
-        _expectedDurationMinutesMeta,
-        expectedDurationMinutes.isAcceptableOrUnknown(
-          data['expected_duration_minutes']!,
-          _expectedDurationMinutesMeta,
         ),
       );
     }
@@ -998,15 +1012,19 @@ class $PlansTable extends Plans with TableInfo<$PlansTable, Plan> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}date'],
       )!,
-      planType: $PlansTable.$converterplanType.fromSql(
+      activityType: $PlansTable.$converteractivityType.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.int,
-          data['${effectivePrefix}plan_type'],
+          data['${effectivePrefix}activity_type'],
         )!,
       ),
-      length: attachedDatabase.typeMapping.read(
+      distanceKm: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
-        data['${effectivePrefix}length'],
+        data['${effectivePrefix}distance_km'],
+      )!,
+      durationMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}duration_minutes'],
       )!,
       targetCarbsPerHour: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
@@ -1020,13 +1038,15 @@ class $PlansTable extends Plans with TableInfo<$PlansTable, Plan> {
         DriftSqlType.double,
         data['${effectivePrefix}target_caffeine_per_hour'],
       )!,
+      planType: $PlansTable.$converterplanTypen.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}plan_type'],
+        ),
+      ),
       intakeInterval: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}intake_interval'],
-      ),
-      expectedDurationMinutes: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}expected_duration_minutes'],
       ),
       comments: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -1042,8 +1062,12 @@ class $PlansTable extends Plans with TableInfo<$PlansTable, Plan> {
 
   static JsonTypeConverter2<SyncStatus, int, int> $convertersyncStatus =
       const EnumIndexConverter<SyncStatus>(SyncStatus.values);
+  static JsonTypeConverter2<ActivityType, int, int> $converteractivityType =
+      const EnumIndexConverter<ActivityType>(ActivityType.values);
   static JsonTypeConverter2<PlanType, int, int> $converterplanType =
       const EnumIndexConverter<PlanType>(PlanType.values);
+  static JsonTypeConverter2<PlanType?, int?, int?> $converterplanTypen =
+      JsonTypeConverter2.asNullable($converterplanType);
 }
 
 class Plan extends DataClass implements Insertable<Plan> {
@@ -1054,23 +1078,20 @@ class Plan extends DataClass implements Insertable<Plan> {
   final String? userId;
   final String name;
   final DateTime date;
-  final PlanType planType;
+  final ActivityType activityType;
 
-  /// The plan's extent, read in [planType]'s unit: km for distance,
-  /// minutes for duration.
-  final double length;
+  /// Both are always set; pace/speed is derived from them (distance ÷ time).
+  final double distanceKm;
+  final int durationMinutes;
   final double targetCarbsPerHour;
   final double targetSodiumPerHour;
   final double targetCaffeinePerHour;
 
-  /// Planned gap between intakes, in the plan's unit (km or minutes).
-  /// Null if there's no fixed gap.
-  final double? intakeInterval;
+  /// Intake-tracking mode, chosen at the matching step (null until then).
+  final PlanType? planType;
 
-  /// For a distance plan, bridges km → time so the per-hour targets can be
-  /// computed. Null for a duration plan (length is already time). The UI can
-  /// let the user enter this as pace (min/km) or speed (km/h) and convert.
-  final int? expectedDurationMinutes;
+  /// Planned gap between intakes, in [planType]'s unit. Set at matching.
+  final double? intakeInterval;
 
   /// Free-text notes, before or after the activity.
   final String? comments;
@@ -1082,13 +1103,14 @@ class Plan extends DataClass implements Insertable<Plan> {
     this.userId,
     required this.name,
     required this.date,
-    required this.planType,
-    required this.length,
+    required this.activityType,
+    required this.distanceKm,
+    required this.durationMinutes,
     required this.targetCarbsPerHour,
     required this.targetSodiumPerHour,
     required this.targetCaffeinePerHour,
+    this.planType,
     this.intakeInterval,
-    this.expectedDurationMinutes,
     this.comments,
   });
   @override
@@ -1110,19 +1132,22 @@ class Plan extends DataClass implements Insertable<Plan> {
     map['name'] = Variable<String>(name);
     map['date'] = Variable<DateTime>(date);
     {
-      map['plan_type'] = Variable<int>(
-        $PlansTable.$converterplanType.toSql(planType),
+      map['activity_type'] = Variable<int>(
+        $PlansTable.$converteractivityType.toSql(activityType),
       );
     }
-    map['length'] = Variable<double>(length);
+    map['distance_km'] = Variable<double>(distanceKm);
+    map['duration_minutes'] = Variable<int>(durationMinutes);
     map['target_carbs_per_hour'] = Variable<double>(targetCarbsPerHour);
     map['target_sodium_per_hour'] = Variable<double>(targetSodiumPerHour);
     map['target_caffeine_per_hour'] = Variable<double>(targetCaffeinePerHour);
+    if (!nullToAbsent || planType != null) {
+      map['plan_type'] = Variable<int>(
+        $PlansTable.$converterplanTypen.toSql(planType),
+      );
+    }
     if (!nullToAbsent || intakeInterval != null) {
       map['intake_interval'] = Variable<double>(intakeInterval);
-    }
-    if (!nullToAbsent || expectedDurationMinutes != null) {
-      map['expected_duration_minutes'] = Variable<int>(expectedDurationMinutes);
     }
     if (!nullToAbsent || comments != null) {
       map['comments'] = Variable<String>(comments);
@@ -1143,17 +1168,18 @@ class Plan extends DataClass implements Insertable<Plan> {
           : Value(userId),
       name: Value(name),
       date: Value(date),
-      planType: Value(planType),
-      length: Value(length),
+      activityType: Value(activityType),
+      distanceKm: Value(distanceKm),
+      durationMinutes: Value(durationMinutes),
       targetCarbsPerHour: Value(targetCarbsPerHour),
       targetSodiumPerHour: Value(targetSodiumPerHour),
       targetCaffeinePerHour: Value(targetCaffeinePerHour),
+      planType: planType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(planType),
       intakeInterval: intakeInterval == null && nullToAbsent
           ? const Value.absent()
           : Value(intakeInterval),
-      expectedDurationMinutes: expectedDurationMinutes == null && nullToAbsent
-          ? const Value.absent()
-          : Value(expectedDurationMinutes),
       comments: comments == null && nullToAbsent
           ? const Value.absent()
           : Value(comments),
@@ -1175,10 +1201,11 @@ class Plan extends DataClass implements Insertable<Plan> {
       userId: serializer.fromJson<String?>(json['userId']),
       name: serializer.fromJson<String>(json['name']),
       date: serializer.fromJson<DateTime>(json['date']),
-      planType: $PlansTable.$converterplanType.fromJson(
-        serializer.fromJson<int>(json['planType']),
+      activityType: $PlansTable.$converteractivityType.fromJson(
+        serializer.fromJson<int>(json['activityType']),
       ),
-      length: serializer.fromJson<double>(json['length']),
+      distanceKm: serializer.fromJson<double>(json['distanceKm']),
+      durationMinutes: serializer.fromJson<int>(json['durationMinutes']),
       targetCarbsPerHour: serializer.fromJson<double>(
         json['targetCarbsPerHour'],
       ),
@@ -1188,10 +1215,10 @@ class Plan extends DataClass implements Insertable<Plan> {
       targetCaffeinePerHour: serializer.fromJson<double>(
         json['targetCaffeinePerHour'],
       ),
-      intakeInterval: serializer.fromJson<double?>(json['intakeInterval']),
-      expectedDurationMinutes: serializer.fromJson<int?>(
-        json['expectedDurationMinutes'],
+      planType: $PlansTable.$converterplanTypen.fromJson(
+        serializer.fromJson<int?>(json['planType']),
       ),
+      intakeInterval: serializer.fromJson<double?>(json['intakeInterval']),
       comments: serializer.fromJson<String?>(json['comments']),
     );
   }
@@ -1208,17 +1235,18 @@ class Plan extends DataClass implements Insertable<Plan> {
       'userId': serializer.toJson<String?>(userId),
       'name': serializer.toJson<String>(name),
       'date': serializer.toJson<DateTime>(date),
-      'planType': serializer.toJson<int>(
-        $PlansTable.$converterplanType.toJson(planType),
+      'activityType': serializer.toJson<int>(
+        $PlansTable.$converteractivityType.toJson(activityType),
       ),
-      'length': serializer.toJson<double>(length),
+      'distanceKm': serializer.toJson<double>(distanceKm),
+      'durationMinutes': serializer.toJson<int>(durationMinutes),
       'targetCarbsPerHour': serializer.toJson<double>(targetCarbsPerHour),
       'targetSodiumPerHour': serializer.toJson<double>(targetSodiumPerHour),
       'targetCaffeinePerHour': serializer.toJson<double>(targetCaffeinePerHour),
-      'intakeInterval': serializer.toJson<double?>(intakeInterval),
-      'expectedDurationMinutes': serializer.toJson<int?>(
-        expectedDurationMinutes,
+      'planType': serializer.toJson<int?>(
+        $PlansTable.$converterplanTypen.toJson(planType),
       ),
+      'intakeInterval': serializer.toJson<double?>(intakeInterval),
       'comments': serializer.toJson<String?>(comments),
     };
   }
@@ -1231,13 +1259,14 @@ class Plan extends DataClass implements Insertable<Plan> {
     Value<String?> userId = const Value.absent(),
     String? name,
     DateTime? date,
-    PlanType? planType,
-    double? length,
+    ActivityType? activityType,
+    double? distanceKm,
+    int? durationMinutes,
     double? targetCarbsPerHour,
     double? targetSodiumPerHour,
     double? targetCaffeinePerHour,
+    Value<PlanType?> planType = const Value.absent(),
     Value<double?> intakeInterval = const Value.absent(),
-    Value<int?> expectedDurationMinutes = const Value.absent(),
     Value<String?> comments = const Value.absent(),
   }) => Plan(
     id: id ?? this.id,
@@ -1247,17 +1276,16 @@ class Plan extends DataClass implements Insertable<Plan> {
     userId: userId.present ? userId.value : this.userId,
     name: name ?? this.name,
     date: date ?? this.date,
-    planType: planType ?? this.planType,
-    length: length ?? this.length,
+    activityType: activityType ?? this.activityType,
+    distanceKm: distanceKm ?? this.distanceKm,
+    durationMinutes: durationMinutes ?? this.durationMinutes,
     targetCarbsPerHour: targetCarbsPerHour ?? this.targetCarbsPerHour,
     targetSodiumPerHour: targetSodiumPerHour ?? this.targetSodiumPerHour,
     targetCaffeinePerHour: targetCaffeinePerHour ?? this.targetCaffeinePerHour,
+    planType: planType.present ? planType.value : this.planType,
     intakeInterval: intakeInterval.present
         ? intakeInterval.value
         : this.intakeInterval,
-    expectedDurationMinutes: expectedDurationMinutes.present
-        ? expectedDurationMinutes.value
-        : this.expectedDurationMinutes,
     comments: comments.present ? comments.value : this.comments,
   );
   Plan copyWithCompanion(PlansCompanion data) {
@@ -1271,8 +1299,15 @@ class Plan extends DataClass implements Insertable<Plan> {
       userId: data.userId.present ? data.userId.value : this.userId,
       name: data.name.present ? data.name.value : this.name,
       date: data.date.present ? data.date.value : this.date,
-      planType: data.planType.present ? data.planType.value : this.planType,
-      length: data.length.present ? data.length.value : this.length,
+      activityType: data.activityType.present
+          ? data.activityType.value
+          : this.activityType,
+      distanceKm: data.distanceKm.present
+          ? data.distanceKm.value
+          : this.distanceKm,
+      durationMinutes: data.durationMinutes.present
+          ? data.durationMinutes.value
+          : this.durationMinutes,
       targetCarbsPerHour: data.targetCarbsPerHour.present
           ? data.targetCarbsPerHour.value
           : this.targetCarbsPerHour,
@@ -1282,12 +1317,10 @@ class Plan extends DataClass implements Insertable<Plan> {
       targetCaffeinePerHour: data.targetCaffeinePerHour.present
           ? data.targetCaffeinePerHour.value
           : this.targetCaffeinePerHour,
+      planType: data.planType.present ? data.planType.value : this.planType,
       intakeInterval: data.intakeInterval.present
           ? data.intakeInterval.value
           : this.intakeInterval,
-      expectedDurationMinutes: data.expectedDurationMinutes.present
-          ? data.expectedDurationMinutes.value
-          : this.expectedDurationMinutes,
       comments: data.comments.present ? data.comments.value : this.comments,
     );
   }
@@ -1302,13 +1335,14 @@ class Plan extends DataClass implements Insertable<Plan> {
           ..write('userId: $userId, ')
           ..write('name: $name, ')
           ..write('date: $date, ')
-          ..write('planType: $planType, ')
-          ..write('length: $length, ')
+          ..write('activityType: $activityType, ')
+          ..write('distanceKm: $distanceKm, ')
+          ..write('durationMinutes: $durationMinutes, ')
           ..write('targetCarbsPerHour: $targetCarbsPerHour, ')
           ..write('targetSodiumPerHour: $targetSodiumPerHour, ')
           ..write('targetCaffeinePerHour: $targetCaffeinePerHour, ')
+          ..write('planType: $planType, ')
           ..write('intakeInterval: $intakeInterval, ')
-          ..write('expectedDurationMinutes: $expectedDurationMinutes, ')
           ..write('comments: $comments')
           ..write(')'))
         .toString();
@@ -1323,13 +1357,14 @@ class Plan extends DataClass implements Insertable<Plan> {
     userId,
     name,
     date,
-    planType,
-    length,
+    activityType,
+    distanceKm,
+    durationMinutes,
     targetCarbsPerHour,
     targetSodiumPerHour,
     targetCaffeinePerHour,
+    planType,
     intakeInterval,
-    expectedDurationMinutes,
     comments,
   );
   @override
@@ -1343,13 +1378,14 @@ class Plan extends DataClass implements Insertable<Plan> {
           other.userId == this.userId &&
           other.name == this.name &&
           other.date == this.date &&
-          other.planType == this.planType &&
-          other.length == this.length &&
+          other.activityType == this.activityType &&
+          other.distanceKm == this.distanceKm &&
+          other.durationMinutes == this.durationMinutes &&
           other.targetCarbsPerHour == this.targetCarbsPerHour &&
           other.targetSodiumPerHour == this.targetSodiumPerHour &&
           other.targetCaffeinePerHour == this.targetCaffeinePerHour &&
+          other.planType == this.planType &&
           other.intakeInterval == this.intakeInterval &&
-          other.expectedDurationMinutes == this.expectedDurationMinutes &&
           other.comments == this.comments);
 }
 
@@ -1361,13 +1397,14 @@ class PlansCompanion extends UpdateCompanion<Plan> {
   final Value<String?> userId;
   final Value<String> name;
   final Value<DateTime> date;
-  final Value<PlanType> planType;
-  final Value<double> length;
+  final Value<ActivityType> activityType;
+  final Value<double> distanceKm;
+  final Value<int> durationMinutes;
   final Value<double> targetCarbsPerHour;
   final Value<double> targetSodiumPerHour;
   final Value<double> targetCaffeinePerHour;
+  final Value<PlanType?> planType;
   final Value<double?> intakeInterval;
-  final Value<int?> expectedDurationMinutes;
   final Value<String?> comments;
   final Value<int> rowid;
   const PlansCompanion({
@@ -1378,13 +1415,14 @@ class PlansCompanion extends UpdateCompanion<Plan> {
     this.userId = const Value.absent(),
     this.name = const Value.absent(),
     this.date = const Value.absent(),
-    this.planType = const Value.absent(),
-    this.length = const Value.absent(),
+    this.activityType = const Value.absent(),
+    this.distanceKm = const Value.absent(),
+    this.durationMinutes = const Value.absent(),
     this.targetCarbsPerHour = const Value.absent(),
     this.targetSodiumPerHour = const Value.absent(),
     this.targetCaffeinePerHour = const Value.absent(),
+    this.planType = const Value.absent(),
     this.intakeInterval = const Value.absent(),
-    this.expectedDurationMinutes = const Value.absent(),
     this.comments = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -1396,21 +1434,23 @@ class PlansCompanion extends UpdateCompanion<Plan> {
     this.userId = const Value.absent(),
     required String name,
     required DateTime date,
-    required PlanType planType,
-    required double length,
+    required ActivityType activityType,
+    required double distanceKm,
+    required int durationMinutes,
     this.targetCarbsPerHour = const Value.absent(),
     this.targetSodiumPerHour = const Value.absent(),
     this.targetCaffeinePerHour = const Value.absent(),
+    this.planType = const Value.absent(),
     this.intakeInterval = const Value.absent(),
-    this.expectedDurationMinutes = const Value.absent(),
     this.comments = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        updatedAt = Value(updatedAt),
        name = Value(name),
        date = Value(date),
-       planType = Value(planType),
-       length = Value(length);
+       activityType = Value(activityType),
+       distanceKm = Value(distanceKm),
+       durationMinutes = Value(durationMinutes);
   static Insertable<Plan> custom({
     Expression<String>? id,
     Expression<DateTime>? updatedAt,
@@ -1419,13 +1459,14 @@ class PlansCompanion extends UpdateCompanion<Plan> {
     Expression<String>? userId,
     Expression<String>? name,
     Expression<DateTime>? date,
-    Expression<int>? planType,
-    Expression<double>? length,
+    Expression<int>? activityType,
+    Expression<double>? distanceKm,
+    Expression<int>? durationMinutes,
     Expression<double>? targetCarbsPerHour,
     Expression<double>? targetSodiumPerHour,
     Expression<double>? targetCaffeinePerHour,
+    Expression<int>? planType,
     Expression<double>? intakeInterval,
-    Expression<int>? expectedDurationMinutes,
     Expression<String>? comments,
     Expression<int>? rowid,
   }) {
@@ -1437,17 +1478,17 @@ class PlansCompanion extends UpdateCompanion<Plan> {
       if (userId != null) 'user_id': userId,
       if (name != null) 'name': name,
       if (date != null) 'date': date,
-      if (planType != null) 'plan_type': planType,
-      if (length != null) 'length': length,
+      if (activityType != null) 'activity_type': activityType,
+      if (distanceKm != null) 'distance_km': distanceKm,
+      if (durationMinutes != null) 'duration_minutes': durationMinutes,
       if (targetCarbsPerHour != null)
         'target_carbs_per_hour': targetCarbsPerHour,
       if (targetSodiumPerHour != null)
         'target_sodium_per_hour': targetSodiumPerHour,
       if (targetCaffeinePerHour != null)
         'target_caffeine_per_hour': targetCaffeinePerHour,
+      if (planType != null) 'plan_type': planType,
       if (intakeInterval != null) 'intake_interval': intakeInterval,
-      if (expectedDurationMinutes != null)
-        'expected_duration_minutes': expectedDurationMinutes,
       if (comments != null) 'comments': comments,
       if (rowid != null) 'rowid': rowid,
     });
@@ -1461,13 +1502,14 @@ class PlansCompanion extends UpdateCompanion<Plan> {
     Value<String?>? userId,
     Value<String>? name,
     Value<DateTime>? date,
-    Value<PlanType>? planType,
-    Value<double>? length,
+    Value<ActivityType>? activityType,
+    Value<double>? distanceKm,
+    Value<int>? durationMinutes,
     Value<double>? targetCarbsPerHour,
     Value<double>? targetSodiumPerHour,
     Value<double>? targetCaffeinePerHour,
+    Value<PlanType?>? planType,
     Value<double?>? intakeInterval,
-    Value<int?>? expectedDurationMinutes,
     Value<String?>? comments,
     Value<int>? rowid,
   }) {
@@ -1479,15 +1521,15 @@ class PlansCompanion extends UpdateCompanion<Plan> {
       userId: userId ?? this.userId,
       name: name ?? this.name,
       date: date ?? this.date,
-      planType: planType ?? this.planType,
-      length: length ?? this.length,
+      activityType: activityType ?? this.activityType,
+      distanceKm: distanceKm ?? this.distanceKm,
+      durationMinutes: durationMinutes ?? this.durationMinutes,
       targetCarbsPerHour: targetCarbsPerHour ?? this.targetCarbsPerHour,
       targetSodiumPerHour: targetSodiumPerHour ?? this.targetSodiumPerHour,
       targetCaffeinePerHour:
           targetCaffeinePerHour ?? this.targetCaffeinePerHour,
+      planType: planType ?? this.planType,
       intakeInterval: intakeInterval ?? this.intakeInterval,
-      expectedDurationMinutes:
-          expectedDurationMinutes ?? this.expectedDurationMinutes,
       comments: comments ?? this.comments,
       rowid: rowid ?? this.rowid,
     );
@@ -1519,13 +1561,16 @@ class PlansCompanion extends UpdateCompanion<Plan> {
     if (date.present) {
       map['date'] = Variable<DateTime>(date.value);
     }
-    if (planType.present) {
-      map['plan_type'] = Variable<int>(
-        $PlansTable.$converterplanType.toSql(planType.value),
+    if (activityType.present) {
+      map['activity_type'] = Variable<int>(
+        $PlansTable.$converteractivityType.toSql(activityType.value),
       );
     }
-    if (length.present) {
-      map['length'] = Variable<double>(length.value);
+    if (distanceKm.present) {
+      map['distance_km'] = Variable<double>(distanceKm.value);
+    }
+    if (durationMinutes.present) {
+      map['duration_minutes'] = Variable<int>(durationMinutes.value);
     }
     if (targetCarbsPerHour.present) {
       map['target_carbs_per_hour'] = Variable<double>(targetCarbsPerHour.value);
@@ -1540,13 +1585,13 @@ class PlansCompanion extends UpdateCompanion<Plan> {
         targetCaffeinePerHour.value,
       );
     }
+    if (planType.present) {
+      map['plan_type'] = Variable<int>(
+        $PlansTable.$converterplanTypen.toSql(planType.value),
+      );
+    }
     if (intakeInterval.present) {
       map['intake_interval'] = Variable<double>(intakeInterval.value);
-    }
-    if (expectedDurationMinutes.present) {
-      map['expected_duration_minutes'] = Variable<int>(
-        expectedDurationMinutes.value,
-      );
     }
     if (comments.present) {
       map['comments'] = Variable<String>(comments.value);
@@ -1567,13 +1612,14 @@ class PlansCompanion extends UpdateCompanion<Plan> {
           ..write('userId: $userId, ')
           ..write('name: $name, ')
           ..write('date: $date, ')
-          ..write('planType: $planType, ')
-          ..write('length: $length, ')
+          ..write('activityType: $activityType, ')
+          ..write('distanceKm: $distanceKm, ')
+          ..write('durationMinutes: $durationMinutes, ')
           ..write('targetCarbsPerHour: $targetCarbsPerHour, ')
           ..write('targetSodiumPerHour: $targetSodiumPerHour, ')
           ..write('targetCaffeinePerHour: $targetCaffeinePerHour, ')
+          ..write('planType: $planType, ')
           ..write('intakeInterval: $intakeInterval, ')
-          ..write('expectedDurationMinutes: $expectedDurationMinutes, ')
           ..write('comments: $comments, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -2598,13 +2644,14 @@ typedef $$PlansTableCreateCompanionBuilder = PlansCompanion Function({
   Value<String?> userId,
   required String name,
   required DateTime date,
-  required PlanType planType,
-  required double length,
+  required ActivityType activityType,
+  required double distanceKm,
+  required int durationMinutes,
   Value<double> targetCarbsPerHour,
   Value<double> targetSodiumPerHour,
   Value<double> targetCaffeinePerHour,
+  Value<PlanType?> planType,
   Value<double?> intakeInterval,
-  Value<int?> expectedDurationMinutes,
   Value<String?> comments,
   Value<int> rowid,
 });
@@ -2616,13 +2663,14 @@ typedef $$PlansTableUpdateCompanionBuilder = PlansCompanion Function({
   Value<String?> userId,
   Value<String> name,
   Value<DateTime> date,
-  Value<PlanType> planType,
-  Value<double> length,
+  Value<ActivityType> activityType,
+  Value<double> distanceKm,
+  Value<int> durationMinutes,
   Value<double> targetCarbsPerHour,
   Value<double> targetSodiumPerHour,
   Value<double> targetCaffeinePerHour,
+  Value<PlanType?> planType,
   Value<double?> intakeInterval,
-  Value<int?> expectedDurationMinutes,
   Value<String?> comments,
   Value<int> rowid,
 });
@@ -2694,14 +2742,19 @@ class $$PlansTableFilterComposer extends Composer<_$AppDatabase, $PlansTable> {
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<PlanType, PlanType, int> get planType =>
-      $composableBuilder(
-        column: $table.planType,
-        builder: (column) => ColumnWithTypeConverterFilters(column),
-      );
+  ColumnWithTypeConverterFilters<ActivityType, ActivityType, int>
+  get activityType => $composableBuilder(
+    column: $table.activityType,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
 
-  ColumnFilters<double> get length => $composableBuilder(
-    column: $table.length,
+  ColumnFilters<double> get distanceKm => $composableBuilder(
+    column: $table.distanceKm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get durationMinutes => $composableBuilder(
+    column: $table.durationMinutes,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2720,13 +2773,14 @@ class $$PlansTableFilterComposer extends Composer<_$AppDatabase, $PlansTable> {
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnWithTypeConverterFilters<PlanType?, PlanType, int> get planType =>
+      $composableBuilder(
+        column: $table.planType,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
   ColumnFilters<double> get intakeInterval => $composableBuilder(
     column: $table.intakeInterval,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get expectedDurationMinutes => $composableBuilder(
-    column: $table.expectedDurationMinutes,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2805,13 +2859,18 @@ class $$PlansTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get planType => $composableBuilder(
-    column: $table.planType,
+  ColumnOrderings<int> get activityType => $composableBuilder(
+    column: $table.activityType,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<double> get length => $composableBuilder(
-    column: $table.length,
+  ColumnOrderings<double> get distanceKm => $composableBuilder(
+    column: $table.distanceKm,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get durationMinutes => $composableBuilder(
+    column: $table.durationMinutes,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -2830,13 +2889,13 @@ class $$PlansTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<double> get intakeInterval => $composableBuilder(
-    column: $table.intakeInterval,
+  ColumnOrderings<int> get planType => $composableBuilder(
+    column: $table.planType,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get expectedDurationMinutes => $composableBuilder(
-    column: $table.expectedDurationMinutes,
+  ColumnOrderings<double> get intakeInterval => $composableBuilder(
+    column: $table.intakeInterval,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -2879,11 +2938,21 @@ class $$PlansTableAnnotationComposer
   GeneratedColumn<DateTime> get date =>
       $composableBuilder(column: $table.date, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<PlanType, int> get planType =>
-      $composableBuilder(column: $table.planType, builder: (column) => column);
+  GeneratedColumnWithTypeConverter<ActivityType, int> get activityType =>
+      $composableBuilder(
+        column: $table.activityType,
+        builder: (column) => column,
+      );
 
-  GeneratedColumn<double> get length =>
-      $composableBuilder(column: $table.length, builder: (column) => column);
+  GeneratedColumn<double> get distanceKm => $composableBuilder(
+    column: $table.distanceKm,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get durationMinutes => $composableBuilder(
+    column: $table.durationMinutes,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<double> get targetCarbsPerHour => $composableBuilder(
     column: $table.targetCarbsPerHour,
@@ -2900,13 +2969,11 @@ class $$PlansTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumnWithTypeConverter<PlanType?, int> get planType =>
+      $composableBuilder(column: $table.planType, builder: (column) => column);
+
   GeneratedColumn<double> get intakeInterval => $composableBuilder(
     column: $table.intakeInterval,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get expectedDurationMinutes => $composableBuilder(
-    column: $table.expectedDurationMinutes,
     builder: (column) => column,
   );
 
@@ -2974,13 +3041,14 @@ class $$PlansTableTableManager
                 Value<String?> userId = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<DateTime> date = const Value.absent(),
-                Value<PlanType> planType = const Value.absent(),
-                Value<double> length = const Value.absent(),
+                Value<ActivityType> activityType = const Value.absent(),
+                Value<double> distanceKm = const Value.absent(),
+                Value<int> durationMinutes = const Value.absent(),
                 Value<double> targetCarbsPerHour = const Value.absent(),
                 Value<double> targetSodiumPerHour = const Value.absent(),
                 Value<double> targetCaffeinePerHour = const Value.absent(),
+                Value<PlanType?> planType = const Value.absent(),
                 Value<double?> intakeInterval = const Value.absent(),
-                Value<int?> expectedDurationMinutes = const Value.absent(),
                 Value<String?> comments = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PlansCompanion(
@@ -2991,13 +3059,14 @@ class $$PlansTableTableManager
                 userId: userId,
                 name: name,
                 date: date,
-                planType: planType,
-                length: length,
+                activityType: activityType,
+                distanceKm: distanceKm,
+                durationMinutes: durationMinutes,
                 targetCarbsPerHour: targetCarbsPerHour,
                 targetSodiumPerHour: targetSodiumPerHour,
                 targetCaffeinePerHour: targetCaffeinePerHour,
+                planType: planType,
                 intakeInterval: intakeInterval,
-                expectedDurationMinutes: expectedDurationMinutes,
                 comments: comments,
                 rowid: rowid,
               ),
@@ -3010,13 +3079,14 @@ class $$PlansTableTableManager
                 Value<String?> userId = const Value.absent(),
                 required String name,
                 required DateTime date,
-                required PlanType planType,
-                required double length,
+                required ActivityType activityType,
+                required double distanceKm,
+                required int durationMinutes,
                 Value<double> targetCarbsPerHour = const Value.absent(),
                 Value<double> targetSodiumPerHour = const Value.absent(),
                 Value<double> targetCaffeinePerHour = const Value.absent(),
+                Value<PlanType?> planType = const Value.absent(),
                 Value<double?> intakeInterval = const Value.absent(),
-                Value<int?> expectedDurationMinutes = const Value.absent(),
                 Value<String?> comments = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PlansCompanion.insert(
@@ -3027,13 +3097,14 @@ class $$PlansTableTableManager
                 userId: userId,
                 name: name,
                 date: date,
-                planType: planType,
-                length: length,
+                activityType: activityType,
+                distanceKm: distanceKm,
+                durationMinutes: durationMinutes,
                 targetCarbsPerHour: targetCarbsPerHour,
                 targetSodiumPerHour: targetSodiumPerHour,
                 targetCaffeinePerHour: targetCaffeinePerHour,
+                planType: planType,
                 intakeInterval: intakeInterval,
-                expectedDurationMinutes: expectedDurationMinutes,
                 comments: comments,
                 rowid: rowid,
               ),

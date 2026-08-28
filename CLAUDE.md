@@ -100,8 +100,11 @@ No hardcoded user-facing strings. Uses Flutter's official gen-l10n pipeline:
 ## Status
 
 - ✅ Foods feature (list, add/edit with photo, soft delete) — the reference vertical slice.
-- ◻ Plans: data layer + list screen done. UI pending — create-plan form (no FAB yet),
-  food→timeline matching, plan detail (tiles have no onTap yet).
+- ◻ Plans: data layer, list screen, and create-plan form done. A plan now has
+  `activityType` (run/bike), `distanceKm` + `durationMinutes` (both stored; pace/speed
+  derived), and `planType` is nullable — the intake-tracking mode (distance/time) + interval
+  are chosen later at the matching step. UI pending — synced distance/duration/pace + target
+  sliders on the form, food→timeline matching, plan detail/edit.
 - App opens into a bottom-nav shell (`core/router/app_shell.dart`) via
   `StatefulShellRoute.indexedStack` — Foods + Plans branches, each keeping its own stack.
   Food add/edit pushes full-screen over the shell (root navigator key).

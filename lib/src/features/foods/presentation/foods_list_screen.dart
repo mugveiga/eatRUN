@@ -37,6 +37,7 @@ class FoodsListScreen extends ConsumerWidget {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'foodsFab',
         onPressed: () => context.push('/foods/new'),
         icon: const Icon(Icons.add),
         label: Text(l10n.addFood),
