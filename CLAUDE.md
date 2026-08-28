@@ -108,7 +108,9 @@ No hardcoded user-facing strings. Uses Flutter's official gen-l10n pipeline:
 - ✅ Foods feature (list, add/edit with photo, soft delete) — the reference vertical slice.
   Sodium field has a swap button to enter salt (g) instead; always stored as sodium mg
   (sodium_mg = salt_g × 400).
-- ◻ Plans: data layer, list screen, and create-plan form done. A plan now has
+- ✅ Plans: full flow — list, create/edit form (synced sliders), detail, approximate intake
+  tracking, food→timeline matching with fine-tune, and per-hour scoring vs targets.
+- ◻ Plans internals: data layer, list screen, and create-plan form. A plan now has
   `activityType` (run/bike), `distanceKm` + `durationMinutes` (both stored; pace/speed
   derived), and `planType` is nullable — the intake-tracking mode (distance/time) + interval
   are chosen later at the matching step. The create form uses slider+type-in inputs
@@ -127,7 +129,8 @@ No hardcoded user-facing strings. Uses Flutter's official gen-l10n pipeline:
   (one-way Plans→Foods domain dependency). Edit a plan via the pencil on the detail AppBar
   (`/plans/:id/edit`) — the form loads with `planId` and pre-fills; it also carries
   `planType`/`intakeInterval` back through `savePlan` so editing settings doesn't wipe the
-  intake tracking. UI pending — scoring (per-hour vs targets).
+  intake tracking. Score card (`_Score`) rolls placed foods into actual carbs/sodium/caffeine
+  per hour (total ÷ duration-hours) vs targets, with progress bars.
 - App opens into a bottom-nav shell (`core/router/app_shell.dart`) via
   `StatefulShellRoute.indexedStack` — Foods + Plans branches, each keeping its own stack.
   Food add/edit pushes full-screen over the shell (root navigator key).

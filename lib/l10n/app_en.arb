@@ -81,6 +81,7 @@
   "planTimeline": "Intake timeline",
   "noIntakeYet": "No intake planned yet.",
   "addIntakePoint": "Add intake point",
+  "scoreTitle": "Planned vs target (per hour)",
   "intakeTracking": "Approximate intake tracking",
   "itemPositionDistance": "Position (km)",
   "itemPositionTime": "Position (min)",

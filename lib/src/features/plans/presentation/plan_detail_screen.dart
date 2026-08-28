@@ -119,6 +119,8 @@ class _Detail extends ConsumerWidget {
             )
           else
             _Timeline(plan: plan, planId: planId),
+          const SizedBox(height: AppSpacing.lg),
+          _Score(plan: plan, planId: planId),
           if (plan.comments != null && plan.comments!.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.lg),
             Text(plan.comments!),
@@ -511,6 +513,86 @@ class _IntakeSectionState extends ConsumerState<_IntakeSection> {
           child: Text(l10n.save),
         ),
       ],
+    );
+  }
+}
+
+/// Rolls placed foods into actual carbs/sodium/caffeine per hour and shows
+/// them against the plan's targets.
+class _Score extends ConsumerWidget {
+  const _Score({required this.plan, required this.planId});
+
+  final Plan plan;
+  final String planId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final placed = ref.watch(planItemsProvider(planId)).value ?? <PlanItem>[];
+    final byId = {
+      for (final f in ref.watch(foodsListProvider).value ?? <Food>[]) f.id: f,
+    };
+
+    var carbs = 0.0, sodium = 0.0, caffeine = 0.0;
+    for (final it in placed) {
+      final f = byId[it.foodId];
+      if (f == null) continue;
+      carbs += f.carbsGrams * it.quantity;
+      sodium += f.sodiumMg * it.quantity;
+      caffeine += f.caffeineMg * it.quantity;
+    }
+    final hours = plan.durationMinutes / 60;
+    double perHour(double total) => hours > 0 ? total / hours : 0;
+
+    return _Card(
+      children: [
+        Text(l10n.scoreTitle, style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: AppSpacing.sm),
+        _ScoreRow(l10n.targetCarbs, perHour(carbs), plan.targetCarbsPerHour),
+        _ScoreRow(l10n.targetSodium, perHour(sodium), plan.targetSodiumPerHour),
+        _ScoreRow(
+          l10n.targetCaffeine,
+          perHour(caffeine),
+          plan.targetCaffeinePerHour,
+        ),
+      ],
+    );
+  }
+}
+
+class _ScoreRow extends StatelessWidget {
+  const _ScoreRow(this.label, this.actual, this.target);
+
+  final String label;
+  final double actual;
+  final double target;
+
+  @override
+  Widget build(BuildContext context) {
+    final ratio = target > 0
+        ? (actual / target).clamp(0.0, 1.0)
+        : (actual > 0 ? 1.0 : 0.0);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: Text(label)),
+              Text(
+                '${actual.round()} / ${target.round()}',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(value: ratio),
+          ),
+        ],
+      ),
     );
   }
 }
