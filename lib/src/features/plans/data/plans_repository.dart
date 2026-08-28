@@ -18,6 +18,15 @@ class PlansRepository {
 
   Future<Plan?> findPlan(String id) => _dao.findPlan(id);
 
+  Stream<Plan?> watchPlan(String id) => _dao.watchPlan(id);
+
+  Future<void> setIntakeTracking({
+    required String id,
+    required PlanType planType,
+    required double interval,
+  }) =>
+      _dao.updateIntake(id, planType, interval);
+
   Stream<List<PlanItem>> watchItems(String planId) => _dao.watchItems(planId);
 
   /// Create (id null) or update a plan. Returns the plan's id so callers can
@@ -78,6 +87,14 @@ class PlansRepository {
       ),
     );
   }
+
+  /// Fine-tune a placed item's position and quantity.
+  Future<void> updateItem({
+    required String id,
+    required double offsetLength,
+    required double quantity,
+  }) =>
+      _dao.updateItem(id, offsetLength, quantity);
 
   Future<void> deletePlan(String id) => _dao.softDeletePlan(id);
 

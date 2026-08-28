@@ -81,6 +81,12 @@ No hardcoded user-facing strings. Uses Flutter's official gen-l10n pipeline:
 
 ## Conventions & gotchas
 
+- **Edge-to-edge insets:** Android 15 draws under the system bars. Screens *inside* the
+  bottom-nav shell get their bottom inset handled by the `NavigationBar`; any screen pushed
+  *over* the shell (forms, detail) must wrap its scroll body in `SafeArea`, and bottom sheets
+  wrap their content in `SafeArea` too — otherwise the last control hides under the nav buttons.
+
+
 - **Codegen ordering:** `build.yaml` forces `drift_dev` before `riverpod_generator`.
 - **Drift types + Riverpod codegen don't mix:** a `@riverpod` function can't return a
   Drift-generated part-file type (e.g. `Food`) — the generator throws `InvalidTypeException`.
@@ -100,14 +106,28 @@ No hardcoded user-facing strings. Uses Flutter's official gen-l10n pipeline:
 ## Status
 
 - ✅ Foods feature (list, add/edit with photo, soft delete) — the reference vertical slice.
+  Sodium field has a swap button to enter salt (g) instead; always stored as sodium mg
+  (sodium_mg = salt_g × 400).
 - ◻ Plans: data layer, list screen, and create-plan form done. A plan now has
   `activityType` (run/bike), `distanceKm` + `durationMinutes` (both stored; pace/speed
   derived), and `planType` is nullable — the intake-tracking mode (distance/time) + interval
   are chosen later at the matching step. The create form uses slider+type-in inputs
   (`_SliderInput`) in two cards (workout / targets). Distance/duration/pace-speed start empty
   and only sync once 2 of the 3 are filled (last-two-touched win; third derived); pace
-  shows/masks as m:ss for runs. Save is gated until 2 are filled. UI pending —
-  food→timeline matching, plan detail/edit.
+  shows/masks as m:ss for runs. Save is gated until 2 are filled. Plan detail screen
+  (tap a plan) shows summary + targets + an intake-tracking card (choose distance/time +
+  interval → sets `planType`/`intakeInterval` via `setIntakeTracking`) + intake timeline.
+  `planProvider` is a stream (reactive). `SliderInput` lives in `core/widgets/`. The
+  approximate-tracking interval seeds *suggested* offsets only — nothing persists until a food
+  is dropped in a slot (creates a `PlanItem` at that `offsetLength`). Empty slots are local UI
+  state in `_Timeline` (not the DB); the interval guesses seed only on a *fresh* timeline (no
+  placed items yet) — re-entering a started plan suggests nothing. Placing a food consumes its
+  slot so moving the item never reopens it, and a "+" adds extra slots. Tapping a placed item
+  opens a fine-tune sheet (position + servings → `updateItem`). Plans imports `foodsListProvider`
+  (one-way Plans→Foods domain dependency). Edit a plan via the pencil on the detail AppBar
+  (`/plans/:id/edit`) — the form loads with `planId` and pre-fills; it also carries
+  `planType`/`intakeInterval` back through `savePlan` so editing settings doesn't wipe the
+  intake tracking. UI pending — scoring (per-hour vs targets).
 - App opens into a bottom-nav shell (`core/router/app_shell.dart`) via
   `StatefulShellRoute.indexedStack` — Foods + Plans branches, each keeping its own stack.
   Food add/edit pushes full-screen over the shell (root navigator key).

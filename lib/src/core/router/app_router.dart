@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/foods/presentation/food_form_screen.dart';
 import '../../features/foods/presentation/foods_list_screen.dart';
+import '../../features/plans/presentation/plan_detail_screen.dart';
 import '../../features/plans/presentation/plan_form_screen.dart';
 import '../../features/plans/presentation/plans_list_screen.dart';
 import 'app_shell.dart';
@@ -49,6 +50,20 @@ final appRouter = GoRouter(
                   path: 'new',
                   parentNavigatorKey: _rootNavigatorKey,
                   builder: (context, state) => const PlanFormScreen(),
+                ),
+                GoRoute(
+                  path: ':id',
+                  parentNavigatorKey: _rootNavigatorKey,
+                  builder: (context, state) =>
+                      PlanDetailScreen(planId: state.pathParameters['id']!),
+                  routes: [
+                    GoRoute(
+                      path: 'edit',
+                      parentNavigatorKey: _rootNavigatorKey,
+                      builder: (context, state) =>
+                          PlanFormScreen(planId: state.pathParameters['id']!),
+                    ),
+                  ],
                 ),
               ],
             ),

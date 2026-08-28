@@ -36,7 +36,38 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
   String? _photoPath;
   bool _loaded = false;
 
+  // 1 g sodium = 2.5 g salt, so sodium(mg) = salt(g) × 400. We always store
+  // sodium; salt mode just converts the entered value.
+  static const _saltPerSodiumMg = 400;
+  bool _saltMode = false;
+
   bool get _isEditing => widget.foodId != null;
+
+  int get _maxSodiumField => _saltMode ? _maxSodium ~/ _saltPerSodiumMg : _maxSodium;
+
+  int get _sodiumMg => _saltMode
+      ? ((double.tryParse(_sodium.text) ?? 0) * _saltPerSodiumMg).round()
+      : (int.tryParse(_sodium.text) ?? 0);
+
+  String _formatSalt(double grams) {
+    var s = grams.toStringAsFixed(2);
+    if (s.contains('.')) {
+      s = s.replaceAll(RegExp(r'0+$'), '').replaceAll(RegExp(r'\.$'), '');
+    }
+    return s;
+  }
+
+  void _toggleSalt() {
+    setState(() {
+      final current = double.tryParse(_sodium.text);
+      if (current != null) {
+        _sodium.text = _saltMode
+            ? (current * _saltPerSodiumMg).round().toString() // salt → sodium
+            : _formatSalt(current / _saltPerSodiumMg); // sodium → salt
+      }
+      _saltMode = !_saltMode;
+    });
+  }
 
   @override
   void initState() {
@@ -110,7 +141,7 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
           name: _name.text.trim(),
           photoPath: _photoPath,
           carbsGrams: int.tryParse(_carbs.text) ?? 0,
-          sodiumMg: int.tryParse(_sodium.text) ?? 0,
+          sodiumMg: _sodiumMg,
           caffeineMg: int.tryParse(_caffeine.text) ?? 0,
           notes: _notes.text.trim().isEmpty ? null : _notes.text.trim(),
         );
@@ -165,10 +196,31 @@ class _FoodFormScreenState extends ConsumerState<FoodFormScreen> {
                 label: l10n.fieldCarbs,
                 max: _maxCarbs,
               ),
-              _NumberField(
+              TextFormField(
                 controller: _sodium,
-                label: l10n.fieldSodium,
-                max: _maxSodium,
+                decoration: InputDecoration(
+                  labelText: _saltMode ? l10n.fieldSalt : l10n.fieldSodium,
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.swap_horiz),
+                    tooltip: l10n.swapSodiumSalt,
+                    onPressed: _toggleSalt,
+                  ),
+                ),
+                keyboardType:
+                    TextInputType.numberWithOptions(decimal: _saltMode),
+                inputFormatters: [
+                  if (_saltMode)
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))
+                  else
+                    FilteringTextInputFormatter.digitsOnly,
+                ],
+                validator: (v) {
+                  if (v == null || v.isEmpty) return null;
+                  final n = double.tryParse(v);
+                  return (n != null && n > _maxSodiumField)
+                      ? l10n.fieldMaxValue(_maxSodiumField)
+                      : null;
+                },
               ),
               _NumberField(
                 controller: _caffeine,

@@ -24,6 +24,22 @@ class PlansDao extends DatabaseAccessor<AppDatabase> with _$PlansDaoMixin {
     return (select(plans)..where((t) => t.id.equals(id))).getSingleOrNull();
   }
 
+  Stream<Plan?> watchPlan(String id) {
+    return (select(plans)..where((t) => t.id.equals(id))).watchSingleOrNull();
+  }
+
+  /// Set the intake-tracking mode and interval (chosen after plan creation).
+  Future<void> updateIntake(String id, PlanType planType, double interval) {
+    return (update(plans)..where((t) => t.id.equals(id))).write(
+      PlansCompanion(
+        planType: Value(planType),
+        intakeInterval: Value(interval),
+        updatedAt: Value(DateTime.now()),
+        syncStatus: const Value(SyncStatus.pending),
+      ),
+    );
+  }
+
   /// Live timeline items for a plan, ordered along the 0 → length axis.
   Stream<List<PlanItem>> watchItems(String planId) {
     return (select(planItems)
@@ -38,6 +54,18 @@ class PlansDao extends DatabaseAccessor<AppDatabase> with _$PlansDaoMixin {
 
   Future<void> upsertItem(PlanItemsCompanion item) {
     return into(planItems).insertOnConflictUpdate(item);
+  }
+
+  /// Fine-tune a placed item's position and quantity.
+  Future<void> updateItem(String id, double offsetLength, double quantity) {
+    return (update(planItems)..where((t) => t.id.equals(id))).write(
+      PlanItemsCompanion(
+        offsetLength: Value(offsetLength),
+        quantity: Value(quantity),
+        updatedAt: Value(DateTime.now()),
+        syncStatus: const Value(SyncStatus.pending),
+      ),
+    );
   }
 
   Future<void> softDeleteItem(String id) {

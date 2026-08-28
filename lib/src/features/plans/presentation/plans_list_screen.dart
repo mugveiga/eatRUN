@@ -62,6 +62,7 @@ class _PlanTile extends ConsumerWidget {
       leading: CircleAvatar(child: Icon(icon)),
       title: Text(plan.name),
       subtitle: Text('$date · $distance'),
+      onTap: () => context.push('/plans/${plan.id}'),
       trailing: IconButton(
         icon: const Icon(Icons.delete_outline),
         onPressed: () => ref.read(plansRepositoryProvider).deletePlan(plan.id),

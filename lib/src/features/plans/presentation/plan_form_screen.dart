@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/database/tables.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/widgets/slider_input.dart';
 import 'plans_providers.dart';
 
 /// The three interdependent workout metrics. Any two determine the third.
@@ -49,7 +50,10 @@ class _PaceInputFormatter extends TextInputFormatter {
 /// Step 1 of plan creation: the plan's parameters. The intake-tracking mode
 /// (by distance or time) and food picking happen on the matching screen.
 class PlanFormScreen extends ConsumerStatefulWidget {
-  const PlanFormScreen({super.key});
+  const PlanFormScreen({super.key, this.planId});
+
+  /// When set, the form edits an existing plan instead of creating one.
+  final String? planId;
 
   @override
   ConsumerState<PlanFormScreen> createState() => _PlanFormScreenState();
@@ -77,6 +81,49 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
   double _carbs = 60;
   double _sodium = 500;
   double _caffeine = 0;
+
+  // Preserved across an edit so saving initial settings doesn't wipe the
+  // intake tracking chosen later. Null for a new plan.
+  PlanType? _planType;
+  double? _intakeInterval;
+
+  bool get _isEditing => widget.planId != null;
+  bool _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_isEditing) {
+      _load();
+    } else {
+      _loaded = true;
+    }
+  }
+
+  Future<void> _load() async {
+    final plan =
+        await ref.read(plansRepositoryProvider).findPlan(widget.planId!);
+    if (plan != null) {
+      _name.text = plan.name;
+      _date = plan.date;
+      _activity = plan.activityType;
+      _distance = plan.distanceKm;
+      _duration = plan.durationMinutes.toDouble();
+      _pace = _isRun
+          ? _duration! / _distance!
+          : 60 * _distance! / _duration!;
+      _filled
+        ..clear()
+        ..addAll([_Metric.duration, _Metric.distance]); // both filled → ready
+      _carbs = plan.targetCarbsPerHour;
+      _sodium = plan.targetSodiumPerHour;
+      _caffeine = plan.targetCaffeinePerHour;
+      _planType = plan.planType;
+      _intakeInterval = plan.intakeInterval;
+      _comments.text = plan.comments ?? '';
+    }
+    if (mounted) setState(() => _loaded = true);
+  }
 
   bool get _isRun => _activity == ActivityType.run;
   double get _paceLo => _isRun ? _paceMin : _speedMin;
@@ -154,6 +201,7 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     await ref.read(plansRepositoryProvider).savePlan(
+          id: widget.planId,
           name: _name.text.trim(),
           date: _date,
           activityType: _activity,
@@ -162,6 +210,8 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
           targetCarbsPerHour: _carbs,
           targetSodiumPerHour: _sodium,
           targetCaffeinePerHour: _caffeine,
+          planType: _planType,
+          intakeInterval: _intakeInterval,
           comments:
               _comments.text.trim().isEmpty ? null : _comments.text.trim(),
         );
@@ -171,8 +221,11 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    if (!_loaded) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.newPlan)),
+      appBar: AppBar(title: Text(_isEditing ? l10n.editPlan : l10n.newPlan)),
       body: Form(
         key: _formKey,
         child: SafeArea(
@@ -219,7 +272,7 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
                     onSelectionChanged: (s) => _setActivity(s.first),
                   ),
                   const SizedBox(height: AppSpacing.sm),
-                  _SliderInput(
+                  SliderInput(
                     label: l10n.planLengthDistance,
                     value: _distance,
                     min: _distMin,
@@ -227,7 +280,7 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
                     divisions: 95,
                     onChanged: (v) => _set(_Metric.distance, v),
                   ),
-                  _SliderInput(
+                  SliderInput(
                     label: l10n.planLengthDuration,
                     value: _duration,
                     min: _durMin,
@@ -235,7 +288,7 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
                     divisions: 114,
                     onChanged: (v) => _set(_Metric.duration, v),
                   ),
-                  _SliderInput(
+                  SliderInput(
                     label: _isRun ? l10n.planPace : l10n.planSpeed,
                     value: _pace,
                     min: _paceLo,
@@ -257,7 +310,7 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: AppSpacing.sm),
-                  _SliderInput(
+                  SliderInput(
                     label: l10n.targetCarbs,
                     value: _carbs,
                     min: 20,
@@ -265,7 +318,7 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
                     divisions: 20,
                     onChanged: (v) => setState(() => _carbs = v),
                   ),
-                  _SliderInput(
+                  SliderInput(
                     label: l10n.targetSodium,
                     value: _sodium,
                     min: 200,
@@ -273,7 +326,7 @@ class _PlanFormScreenState extends ConsumerState<PlanFormScreen> {
                     divisions: 36,
                     onChanged: (v) => setState(() => _sodium = v),
                   ),
-                  _SliderInput(
+                  SliderInput(
                     label: l10n.targetCaffeine,
                     value: _caffeine,
                     min: 0,
@@ -318,118 +371,6 @@ class _Card extends StatelessWidget {
           children: children,
         ),
       ),
-    );
-  }
-}
-
-/// A slider paired with a type-in field, both bound to one nullable value.
-/// A null value shows an empty field and the slider parked at [min].
-class _SliderInput extends StatefulWidget {
-  const _SliderInput({
-    required this.label,
-    required this.value,
-    required this.min,
-    required this.max,
-    required this.onChanged,
-    this.divisions,
-    this.decimals = 0,
-    this.formatValue,
-    this.parseValue,
-    this.inputFormatter,
-  });
-
-  final String label;
-  final double? value;
-  final double min;
-  final double max;
-  final int? divisions;
-  final int decimals;
-  final ValueChanged<double> onChanged;
-  final String Function(double)? formatValue;
-  final double? Function(String)? parseValue;
-  final TextInputFormatter? inputFormatter;
-
-  @override
-  State<_SliderInput> createState() => _SliderInputState();
-}
-
-class _SliderInputState extends State<_SliderInput> {
-  late final TextEditingController _controller;
-  final _focus = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(text: _fieldText());
-    _focus.addListener(() {
-      if (!_focus.hasFocus) _controller.text = _fieldText();
-    });
-  }
-
-  @override
-  void didUpdateWidget(covariant _SliderInput old) {
-    super.didUpdateWidget(old);
-    if (!_focus.hasFocus && widget.value != old.value) {
-      _controller.text = _fieldText();
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _focus.dispose();
-    super.dispose();
-  }
-
-  String _display(double v) {
-    final c = v.clamp(widget.min, widget.max);
-    return widget.formatValue?.call(c) ?? c.toStringAsFixed(widget.decimals);
-  }
-
-  String _fieldText() =>
-      widget.value == null ? '' : _display(widget.value!);
-
-  void _onField(String s) {
-    final n = (widget.parseValue ?? double.tryParse)(s);
-    if (n != null) widget.onChanged(n.clamp(widget.min, widget.max));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final v = (widget.value ?? widget.min).clamp(widget.min, widget.max);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Expanded(child: Text(widget.label)),
-            SizedBox(
-              width: 72,
-              child: TextField(
-                controller: _controller,
-                focusNode: _focus,
-                textAlign: TextAlign.end,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                inputFormatters: [
-                  widget.inputFormatter ??
-                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                ],
-                decoration: const InputDecoration(isDense: true),
-                onChanged: _onField,
-              ),
-            ),
-          ],
-        ),
-        Slider(
-          value: v,
-          min: widget.min,
-          max: widget.max,
-          divisions: widget.divisions,
-          label: _display(v),
-          onChanged: widget.onChanged,
-        ),
-      ],
     );
   }
 }

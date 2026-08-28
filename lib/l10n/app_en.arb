@@ -31,6 +31,8 @@
   },
   "fieldCarbs": "Carbs (g)",
   "fieldSodium": "Sodium (mg)",
+  "fieldSalt": "Salt (g)",
+  "swapSodiumSalt": "Switch between sodium and salt",
   "fieldCaffeine": "Caffeine (mg)",
   "fieldNotes": "Notes",
   "save": "Save",
@@ -56,6 +58,7 @@
 
   "addPlan": "Add plan",
   "newPlan": "New plan",
+  "editPlan": "Edit plan",
   "activityRun": "Run",
   "activityBike": "Bike",
   "planPace": "Pace (min/km)",
@@ -74,5 +77,28 @@
   "targetCaffeine": "Caffeine (mg/h)",
   "planIntakeIntervalDistance": "Intake interval (km)",
   "planIntakeIntervalDuration": "Intake interval (min)",
-  "planComments": "Comments"
+  "planComments": "Comments",
+  "planTimeline": "Intake timeline",
+  "noIntakeYet": "No intake planned yet.",
+  "addIntakePoint": "Add intake point",
+  "intakeTracking": "Approximate intake tracking",
+  "itemPositionDistance": "Position (km)",
+  "itemPositionTime": "Position (min)",
+  "itemServings": "Servings",
+  "planIntakeQuestion": "How do you want to track your intake — by distance (every few km) or by time (every few minutes)?",
+  "intakeByDistance": "Distance",
+  "intakeByTime": "Time",
+  "change": "Change",
+  "intakeEveryKm": "Every {km} km",
+  "@intakeEveryKm": {
+    "placeholders": {
+      "km": { "type": "String" }
+    }
+  },
+  "intakeEveryMin": "Every {minutes} min",
+  "@intakeEveryMin": {
+    "placeholders": {
+      "minutes": { "type": "String" }
+    }
+  }
 }

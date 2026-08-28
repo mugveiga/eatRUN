@@ -19,6 +19,12 @@ final plansListProvider = StreamProvider.autoDispose<List<Plan>>((ref) {
   return ref.watch(plansRepositoryProvider).watchPlans();
 });
 
+/// A single plan by id (null if not found), reactive to edits.
+final planProvider =
+    StreamProvider.autoDispose.family<Plan?, String>((ref, planId) {
+  return ref.watch(plansRepositoryProvider).watchPlan(planId);
+});
+
 /// Reactive timeline items for one plan, keyed by plan id.
 final planItemsProvider =
     StreamProvider.autoDispose.family<List<PlanItem>, String>((ref, planId) {
