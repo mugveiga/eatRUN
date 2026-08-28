@@ -103,8 +103,11 @@ No hardcoded user-facing strings. Uses Flutter's official gen-l10n pipeline:
 - ◻ Plans: data layer, list screen, and create-plan form done. A plan now has
   `activityType` (run/bike), `distanceKm` + `durationMinutes` (both stored; pace/speed
   derived), and `planType` is nullable — the intake-tracking mode (distance/time) + interval
-  are chosen later at the matching step. UI pending — synced distance/duration/pace + target
-  sliders on the form, food→timeline matching, plan detail/edit.
+  are chosen later at the matching step. The create form uses slider+type-in inputs
+  (`_SliderInput`) in two cards (workout / targets). Distance/duration/pace-speed start empty
+  and only sync once 2 of the 3 are filled (last-two-touched win; third derived); pace
+  shows/masks as m:ss for runs. Save is gated until 2 are filled. UI pending —
+  food→timeline matching, plan detail/edit.
 - App opens into a bottom-nav shell (`core/router/app_shell.dart`) via
   `StatefulShellRoute.indexedStack` — Foods + Plans branches, each keeping its own stack.
   Food add/edit pushes full-screen over the shell (root navigator key).
