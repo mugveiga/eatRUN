@@ -73,10 +73,17 @@ drizzle/                    # generated SQL migrations (committed)
 
 ## Status
 
-Foundation + **Foods feature** done: repository (`saveFood`/`findFood`/`deleteFood`, UUIDs +
-sync stamps), `useFoods` (`useLiveQuery`), list screen (FAB, delete, tap-to-edit) and add/edit
-form (photo via camera/gallery, integer nutrition, notes). Screens live in
-`src/features/foods/ui`; route files in `src/app` are thin wrappers. Forms use `useState`
-(simple); the Plan form will use react-hook-form + zod (more fields → justifies it).
-Deferred to match the Flutter progression: salt↔sodium swap, max-value caps, i18n.
+Foundation + **Foods feature (complete)**: repository (`saveFood`/`findFood`/`deleteFood`,
+UUIDs + sync stamps), `useFoods` (`useLiveQuery`), list screen (FAB, delete, tap-to-edit) and
+add/edit form (photo via camera/gallery, integer nutrition on one row, notes, **salt↔sodium
+swap** storing sodium mg, **max caps** via clamp-on-input). Screens live in
+`src/features/foods/ui`; route files in `src/app` are thin wrappers. Foods form uses `useState`
+(the Plan form will use react-hook-form + zod).
+
+**i18n** is wired: `src/core/i18n` (i18next + react-i18next, device locale via
+`expo-localization`, `en.json`, initialized by a side-effect import in `_layout.tsx`). Use
+`const { t } = useTranslation()` then `t('foods.name')`; placeholders via
+`t('foods.nutrition', { carbs, sodium, caffeine })`. Add a language by dropping in another
+resource bundle. (Watch for shadowing: name the `onChangeText` param `text`, not `t`.)
+
 Next: Plans (create → match → score).

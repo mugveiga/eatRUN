@@ -12,6 +12,7 @@ import { ActivityIndicator, PaperProvider, Text } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { db } from '@/core/db/client';
+import '@/core/i18n';
 import { darkTheme, lightTheme } from '@/core/theme/theme';
 import migrations from '../../drizzle/migrations';
 

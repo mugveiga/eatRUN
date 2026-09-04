@@ -2,6 +2,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -24,9 +25,35 @@ import { findFood, saveFood } from '../data/foods-repository';
 
 const onlyDigits = (s: string) => s.replace(/[^0-9]/g, '');
 
+// Keep digits and at most one decimal point.
+const decimalStr = (s: string) => {
+  const c = s.replace(/[^0-9.]/g, '');
+  const i = c.indexOf('.');
+  return i === -1 ? c : c.slice(0, i + 1) + c.slice(i + 1).replace(/\./g, '');
+};
+
+const capInt = (s: string, max: number) =>
+  parseInt(s || '0', 10) > max ? String(max) : s;
+const capFloat = (s: string, max: number) =>
+  parseFloat(s || '0') > max ? String(max) : s;
+
+const formatSalt = (grams: number) => {
+  let s = grams.toFixed(2);
+  if (s.includes('.')) s = s.replace(/0+$/, '').replace(/\.$/, '');
+  return s;
+};
+
+// Realistic per-serving caps. 1 g sodium = 2.5 g salt → sodium_mg = salt_g × 400.
+const MAX_CARBS = 1000;
+const MAX_CAFFEINE = 1000;
+const MAX_SODIUM_MG = 10000;
+const SODIUM_PER_SALT_G = 400;
+const MAX_SALT_G = MAX_SODIUM_MG / SODIUM_PER_SALT_G;
+
 export function FoodFormScreen() {
   const router = useRouter();
   const theme = useTheme();
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const isEditing = !!id;
 
@@ -38,6 +65,8 @@ export function FoodFormScreen() {
   const [caffeine, setCaffeine] = useState('');
   const [notes, setNotes] = useState('');
   const [nameError, setNameError] = useState(false);
+  // Sodium field can accept salt (g) instead; we always store sodium (mg).
+  const [saltMode, setSaltMode] = useState(false);
 
   useEffect(() => {
     if (!isEditing) return;
@@ -69,11 +98,23 @@ export function FoodFormScreen() {
   }
 
   function pickPhoto() {
-    Alert.alert('Photo', undefined, [
-      { text: 'Take photo', onPress: () => launch('camera') },
-      { text: 'Choose from gallery', onPress: () => launch('library') },
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert(t('foods.photo'), undefined, [
+      { text: t('foods.takePhoto'), onPress: () => launch('camera') },
+      { text: t('foods.chooseFromGallery'), onPress: () => launch('library') },
+      { text: t('common.cancel'), style: 'cancel' },
     ]);
+  }
+
+  function toggleSalt() {
+    const cur = parseFloat(sodium);
+    if (!isNaN(cur)) {
+      setSodium(
+        saltMode
+          ? String(Math.round(cur * SODIUM_PER_SALT_G)) // salt g → sodium mg
+          : formatSalt(cur / SODIUM_PER_SALT_G), // sodium mg → salt g
+      );
+    }
+    setSaltMode((m) => !m);
   }
 
   async function save() {
@@ -81,12 +122,15 @@ export function FoodFormScreen() {
       setNameError(true);
       return;
     }
+    const sodiumMg = saltMode
+      ? Math.round((parseFloat(sodium) || 0) * SODIUM_PER_SALT_G)
+      : parseInt(sodium || '0', 10);
     await saveFood({
       id,
       name: name.trim(),
       photoUri,
       carbsGrams: parseInt(carbs || '0', 10),
-      sodiumMg: parseInt(sodium || '0', 10),
+      sodiumMg,
       caffeineMg: parseInt(caffeine || '0', 10),
       notes: notes.trim() || null,
     });
@@ -105,7 +149,7 @@ export function FoodFormScreen() {
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content title={isEditing ? 'Edit food' : 'New food'} />
+        <Appbar.Content title={isEditing ? t('foods.edit') : t('foods.new')} />
       </Appbar.Header>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -140,50 +184,71 @@ export function FoodFormScreen() {
 
           <View>
             <TextInput
-              label="Name"
+              label={t('foods.name')}
               mode="outlined"
               value={name}
               error={nameError}
-              onChangeText={(t) => {
-                setName(t);
+              onChangeText={(text) => {
+                setName(text);
                 setNameError(false);
               }}
             />
-            {nameError && <HelperText type="error">Required</HelperText>}
+            {nameError && (
+              <HelperText type="error">{t('common.required')}</HelperText>
+            )}
           </View>
 
           <View style={{ flexDirection: 'row', gap: 8 }}>
             <TextInput
               style={{ flex: 1 }}
-              label="Carbs"
+              label={t('foods.carbs')}
               mode="outlined"
               keyboardType="number-pad"
               right={<TextInput.Affix text="g" />}
               value={carbs}
-              onChangeText={(t) => setCarbs(onlyDigits(t))}
+              onChangeText={(text) =>
+                setCarbs(capInt(onlyDigits(text), MAX_CARBS))
+              }
             />
             <TextInput
               style={{ flex: 1 }}
-              label="Sodium"
+              label={saltMode ? t('foods.salt') : t('foods.sodium')}
               mode="outlined"
-              keyboardType="number-pad"
-              right={<TextInput.Affix text="mg" />}
+              keyboardType={saltMode ? 'decimal-pad' : 'number-pad'}
+              right={<TextInput.Affix text={saltMode ? 'g' : 'mg'} />}
               value={sodium}
-              onChangeText={(t) => setSodium(onlyDigits(t))}
+              onChangeText={(text) =>
+                setSodium(
+                  saltMode
+                    ? capFloat(decimalStr(text), MAX_SALT_G)
+                    : capInt(onlyDigits(text), MAX_SODIUM_MG),
+                )
+              }
             />
             <TextInput
               style={{ flex: 1 }}
-              label="Caffeine"
+              label={t('foods.caffeine')}
               mode="outlined"
               keyboardType="number-pad"
               right={<TextInput.Affix text="mg" />}
               value={caffeine}
-              onChangeText={(t) => setCaffeine(onlyDigits(t))}
+              onChangeText={(text) =>
+                setCaffeine(capInt(onlyDigits(text), MAX_CAFFEINE))
+              }
             />
           </View>
+          <Button
+            mode="text"
+            compact
+            icon="swap-horizontal"
+            onPress={toggleSalt}
+            style={{ alignSelf: 'flex-start' }}
+          >
+            {saltMode ? t('foods.enterAsSodium') : t('foods.enterAsSalt')}
+          </Button>
 
           <TextInput
-            label="Notes"
+            label={t('foods.notes')}
             mode="outlined"
             multiline
             style={{ minHeight: 110 }}
@@ -191,7 +256,7 @@ export function FoodFormScreen() {
             onChangeText={setNotes}
           />
           <Button mode="contained" onPress={save} style={{ marginTop: 8 }}>
-            Save
+            {t('common.save')}
           </Button>
         </ScrollView>
       </KeyboardAvoidingView>

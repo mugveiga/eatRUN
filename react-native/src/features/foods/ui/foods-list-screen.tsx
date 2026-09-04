@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { FlatList, View } from 'react-native';
 import {
   Avatar,
@@ -14,6 +15,7 @@ import { useFoods } from '../data/use-foods';
 
 export function FoodsListScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { data: items } = useFoods();
 
   return (
@@ -28,7 +30,7 @@ export function FoodsListScreen() {
           }}
         >
           <Text variant="bodyLarge" style={{ textAlign: 'center' }}>
-            No foods yet.{'\n'}Add the gels, drinks and snacks you fuel with.
+            {t('foods.empty')}
           </Text>
         </View>
       ) : (
@@ -40,7 +42,11 @@ export function FoodsListScreen() {
           renderItem={({ item }) => (
             <List.Item
               title={item.name}
-              description={`${item.carbsGrams}g carbs · ${item.sodiumMg}mg sodium · ${item.caffeineMg}mg caffeine`}
+              description={t('foods.nutrition', {
+                carbs: item.carbsGrams,
+                sodium: item.sodiumMg,
+                caffeine: item.caffeineMg,
+              })}
               left={(props) =>
                 item.photoUri ? (
                   <Avatar.Image
@@ -68,7 +74,7 @@ export function FoodsListScreen() {
       )}
       <FAB
         icon="plus"
-        label="Add food"
+        label={t('foods.addFood')}
         style={{ position: 'absolute', right: 16, bottom: 16 }}
         onPress={() => router.push('/foods/new')}
       />

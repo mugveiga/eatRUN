@@ -1,9 +1,11 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from 'react-native-paper';
 
 export default function TabsLayout() {
   const theme = useTheme();
+  const { t } = useTranslation();
   return (
     <Tabs
       screenOptions={{
@@ -14,7 +16,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="foods"
         options={{
-          title: 'Foods',
+          title: t('nav.foods'),
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="food-apple" color={color} size={size} />
           ),
@@ -23,7 +25,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="plans"
         options={{
-          title: 'Plans',
+          title: t('nav.plans'),
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="clipboard-list-outline" color={color} size={size} />
           ),

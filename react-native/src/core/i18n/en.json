@@ -1,0 +1,29 @@
+{
+  "nav": {
+    "foods": "Foods",
+    "plans": "Plans"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "required": "Required"
+  },
+  "foods": {
+    "empty": "No foods yet.\nAdd the gels, drinks and snacks you fuel with.",
+    "addFood": "Add food",
+    "nutrition": "{{carbs}}g carbs · {{sodium}}mg sodium · {{caffeine}}mg caffeine",
+    "new": "New food",
+    "edit": "Edit food",
+    "name": "Name",
+    "carbs": "Carbs",
+    "sodium": "Sodium",
+    "salt": "Salt",
+    "caffeine": "Caffeine",
+    "notes": "Notes",
+    "photo": "Photo",
+    "takePhoto": "Take photo",
+    "chooseFromGallery": "Choose from gallery",
+    "enterAsSalt": "Enter as salt (g)",
+    "enterAsSodium": "Enter as sodium (mg)"
+  }
+}
