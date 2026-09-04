@@ -86,4 +86,15 @@ swap** storing sodium mg, **max caps** via clamp-on-input). Screens live in
 `t('foods.nutrition', { carbs, sodium, caffeine })`. Add a language by dropping in another
 resource bundle. (Watch for shadowing: name the `onChangeText` param `text`, not `t`.)
 
-Next: Plans (create → match → score).
+**Plans (slice 1)**: repository (`savePlan`/`findPlan`/`deletePlan`, cascade soft-delete),
+`usePlans`/`usePlan` (`useLiveQuery`), list (Link nav, delete, FAB), create/edit form with
+**react-hook-form + zod** (`@hookform/resolvers`) + a `@react-native-community/datetimepicker`
+date field + Paper `SegmentedButtons` for run/bike, and a **minimal detail** screen. Routes:
+`plans/new`, `plans/[id]/index` (detail), `plans/[id]/edit`.
+
+Navigation uses expo-router `<Link asChild>` (org standard: no imperative `router.push` on tap;
+`router.back()` after a save/action is fine). Foods list/FAB retrofitted to `<Link>` too.
+Tests are bypassed for this repo (personal interview build) per Murilo.
+
+Next Plans slices: synced distance/duration/pace sliders (replace the plain number fields),
+then intake tracking + food→timeline matching + per-hour scoring on the detail screen.

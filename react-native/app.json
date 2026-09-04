@@ -39,7 +39,8 @@
           "photosPermission": "eatRUN uses your photos to attach pictures to foods.",
           "cameraPermission": "eatRUN uses your camera to take photos of foods."
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,

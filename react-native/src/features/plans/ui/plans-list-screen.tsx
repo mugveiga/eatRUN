@@ -1,21 +1,14 @@
 import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { FlatList, View } from 'react-native';
-import {
-  Avatar,
-  Divider,
-  FAB,
-  IconButton,
-  List,
-  Text,
-} from 'react-native-paper';
+import { Avatar, Divider, FAB, IconButton, List, Text } from 'react-native-paper';
 
-import { deleteFood } from '../data/foods-repository';
-import { useFoods } from '../data/use-foods';
+import { deletePlan } from '../data/plans-repository';
+import { usePlans } from '../data/use-plans';
 
-export function FoodsListScreen() {
+export function PlansListScreen() {
   const { t } = useTranslation();
-  const { data: items } = useFoods();
+  const { data: items } = usePlans();
 
   return (
     <View style={{ flex: 1 }}>
@@ -29,43 +22,42 @@ export function FoodsListScreen() {
           }}
         >
           <Text variant="bodyLarge" style={{ textAlign: 'center' }}>
-            {t('foods.empty')}
+            {t('plans.empty')}
           </Text>
         </View>
       ) : (
         <FlatList
           data={items}
-          keyExtractor={(f) => f.id}
+          keyExtractor={(p) => p.id}
           ItemSeparatorComponent={Divider}
           contentContainerStyle={{ paddingBottom: 96 }}
           renderItem={({ item }) => (
             <Link
-              href={{ pathname: '/foods/[id]', params: { id: item.id } }}
+              href={{ pathname: '/plans/[id]', params: { id: item.id } }}
               asChild
             >
               <List.Item
                 title={item.name}
-                description={t('foods.nutrition', {
-                  carbs: item.carbsGrams,
-                  sodium: item.sodiumMg,
-                  caffeine: item.caffeineMg,
-                })}
-                left={(props) =>
-                  item.photoUri ? (
-                    <Avatar.Image
-                      {...props}
-                      size={40}
-                      source={{ uri: item.photoUri }}
-                    />
-                  ) : (
-                    <Avatar.Icon {...props} size={40} icon="food-apple" />
-                  )
-                }
+                description={`${item.date.toLocaleDateString()} · ${t(
+                  'plans.distanceValue',
+                  { km: String(item.distanceKm) },
+                )}`}
+                left={(props) => (
+                  <Avatar.Icon
+                    {...props}
+                    size={40}
+                    icon={
+                      item.activityType === 'bike'
+                        ? 'bike'
+                        : 'run'
+                    }
+                  />
+                )}
                 right={(props) => (
                   <IconButton
                     {...props}
                     icon="delete-outline"
-                    onPress={() => deleteFood(item.id)}
+                    onPress={() => deletePlan(item.id)}
                   />
                 )}
               />
@@ -73,10 +65,10 @@ export function FoodsListScreen() {
           )}
         />
       )}
-      <Link href="/foods/new" asChild>
+      <Link href="/plans/new" asChild>
         <FAB
           icon="plus"
-          label={t('foods.addFood')}
+          label={t('plans.addPlan')}
           style={{ position: 'absolute', right: 16, bottom: 16 }}
         />
       </Link>

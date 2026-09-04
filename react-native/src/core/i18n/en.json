@@ -25,5 +25,27 @@
     "chooseFromGallery": "Choose from gallery",
     "enterAsSalt": "Enter as salt (g)",
     "enterAsSodium": "Enter as sodium (mg)"
+  },
+  "plans": {
+    "empty": "No plans yet.\nPlan a run or ride to see it here.",
+    "addPlan": "Add plan",
+    "new": "New plan",
+    "edit": "Edit plan",
+    "name": "Name",
+    "date": "Date",
+    "activity": "Activity",
+    "activityRun": "Run",
+    "activityBike": "Bike",
+    "distance": "Distance (km)",
+    "duration": "Duration (min)",
+    "targetsPerHour": "Targets per hour",
+    "targetCarbs": "Carbs (g/h)",
+    "targetSodium": "Sodium (mg/h)",
+    "targetCaffeine": "Caffeine (mg/h)",
+    "carbs": "Carbs",
+    "sodium": "Sodium",
+    "caffeine": "Caffeine",
+    "comments": "Comments",
+    "distanceValue": "{{km}} km"
   }
 }
