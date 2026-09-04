@@ -1,11 +1,5 @@
-import { View } from 'react-native';
-import { Text } from 'react-native-paper';
+import { FoodsListScreen } from '@/features/foods/ui/foods-list-screen';
 
-export default function FoodsScreen() {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text variant="titleLarge">Foods</Text>
-      <Text variant="bodyMedium">Coming next: your food library.</Text>
-    </View>
-  );
+export default function FoodsRoute() {
+  return <FoodsListScreen />;
 }

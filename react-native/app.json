@@ -32,7 +32,14 @@
         }
       ],
       "expo-sqlite",
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "eatRUN uses your photos to attach pictures to foods.",
+          "cameraPermission": "eatRUN uses your camera to take photos of foods."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

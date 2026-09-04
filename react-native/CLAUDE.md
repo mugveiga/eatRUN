@@ -22,8 +22,11 @@ npx expo export -p ios           # bundle (catches Metro/Babel errors)
 - **Drizzle ORM + Expo SQLite** — reactive local DB via `useLiveQuery`; foreign keys ON.
   (Drizzle also targets Postgres, matching the JD's RDS — same ORM device↔backend.)
 - **React Native Paper** (Material Design 3) — components + theming + dark mode.
-- **Zustand** — light cross-cutting state; DB live-queries drive most screens.
-- **react-hook-form + zod** — forms/validation. **i18next** — localization (added with features).
+- **State:** reactive DB via `useLiveQuery` + local component state. No global store —
+  Zustand was removed as unused (YAGNI); re-add (`expo install zustand`) only if a real
+  cross-cutting need appears (e.g. a settings store).
+- **react-hook-form + zod** — forms/validation (used on the Plan form; Foods uses `useState`).
+  Needs `@hookform/resolvers` for `zodResolver`. **i18next** — localization (added with features).
 
 ## Architecture (mirrors the Flutter build)
 
@@ -59,7 +62,21 @@ drizzle/                    # generated SQL migrations (committed)
   (the analog of Drift's `.watch()` streams).
 - **Node:** use 20+ (`nvm use 20`); the machine defaults to 19 which breaks Expo tooling.
 
+## Conventions & gotchas
+
+- **Dark mode needs BOTH themes.** Paper's `PaperProvider theme` only styles Paper
+  components; the nav chrome (status-bar area, headers, tab bar, screen backgrounds) is React
+  Navigation's. `_layout.tsx` wires a `ThemeProvider` (nav) alongside `PaperProvider`, mapping
+  Paper's MD3 colors into the nav theme, both driven by `useColorScheme`. Don't drop it.
+- **Keyboard:** form ScrollViews wrap in `KeyboardAvoidingView` (`padding` iOS / `height`
+  Android) + `keyboardShouldPersistTaps="handled"` so focused fields stay visible.
+
 ## Status
 
-Foundation only: DB layer, theme, tabs shell (Foods/Plans placeholders). Features next —
-Foods, then Plans (create → match → score), mirroring the Flutter build order.
+Foundation + **Foods feature** done: repository (`saveFood`/`findFood`/`deleteFood`, UUIDs +
+sync stamps), `useFoods` (`useLiveQuery`), list screen (FAB, delete, tap-to-edit) and add/edit
+form (photo via camera/gallery, integer nutrition, notes). Screens live in
+`src/features/foods/ui`; route files in `src/app` are thin wrappers. Forms use `useState`
+(simple); the Plan form will use react-hook-form + zod (more fields → justifies it).
+Deferred to match the Flutter progression: salt↔sodium swap, max-value caps, i18n.
+Next: Plans (create → match → score).
