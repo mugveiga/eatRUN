@@ -2,9 +2,11 @@ import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import { ActivityIndicator, Appbar, Card, Text } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { usePlan } from '../data/use-plans';
 import { IntakeSection } from './intake-section';
+import { TimelineSection } from './timeline-section';
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
@@ -21,6 +23,7 @@ export function PlanDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data } = usePlan(id);
   const plan = data.at(0);
+  const insets = useSafeAreaInsets();
 
   return (
     <View style={{ flex: 1 }}>
@@ -36,7 +39,13 @@ export function PlanDetailScreen() {
           <ActivityIndicator />
         </View>
       ) : (
-        <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+        <ScrollView
+          contentContainerStyle={{
+            padding: 16,
+            gap: 12,
+            paddingBottom: insets.bottom + 24,
+          }}
+        >
           <Card>
             <Card.Content>
               <Row label={t('plans.date')} value={plan.date.toLocaleDateString()} />
@@ -73,6 +82,7 @@ export function PlanDetailScreen() {
             </Card.Content>
           </Card>
           <IntakeSection plan={plan} />
+          {plan.planType && <TimelineSection plan={plan} />}
         </ScrollView>
       )}
     </View>

@@ -113,6 +113,14 @@ the `:` from digits typed on the numeric keypad (`530` → `5:30`), snapping to 
 time** + interval (SliderInput), persists via `setIntakeTracking`, then collapses to a summary
 with a Change button. This unlocks `planType`/`intakeInterval` for the timeline.
 
-Remaining timeline slices (mirroring Flutter `plan_detail_screen.dart`): (2) interval-seeded
-timeline with tap-to-add-food bottom sheet + placed tiles + delete; (3) item editor bottom sheet
-(fine-tune offset + servings); (4) per-hour score rollup vs. targets with progress bars.
+**Plans detail — timeline (slice 2)**: `TimelineSection` (`features/plans/ui/timeline-section.tsx`)
+renders when the plan has intake tracking set. Interval-seeded empty slots (local state, from the
+pure `logic/timeline.ts` `seedSlots`/`occupies`) suggest fuel points; tapping one opens a Paper
+`Portal`+`Modal` food picker and persists a `PlanItem` at that offset (`saveItem`), consuming the
+slot. Placed tiles show name ×qty + nutrition scaled by servings, with delete (`deleteItem`, soft).
+"Add fuel point" appends a slot; the ✕ dismisses a suggestion. Slot seeding is derived not
+DB-persisted (so it never depends on `useLiveQuery`'s initial empty tick). Placed-item tap is a
+no-op until slice 3.
+
+Remaining timeline slices (mirroring Flutter `plan_detail_screen.dart`): (3) item editor bottom
+sheet (fine-tune offset + servings); (4) per-hour score rollup vs. targets with progress bars.
