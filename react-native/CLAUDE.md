@@ -96,5 +96,14 @@ Navigation uses expo-router `<Link asChild>` (org standard: no imperative `route
 `router.back()` after a save/action is fine). Foods list/FAB retrofitted to `<Link>` too.
 Tests are bypassed for this repo (personal interview build) per Murilo.
 
-Next Plans slices: synced distance/duration/pace sliders (replace the plain number fields),
-then intake tracking + food→timeline matching + per-hour scoring on the detail screen.
+Plan form now uses **synced sliders** for distance/duration/pace-speed (`SliderInput` in
+`core/widgets`, `@react-native-community/slider`): distance anchors, editing it rescales
+duration holding pace; editing pace/speed or duration recomputes the other. The math is a
+**pure module** `features/plans/logic/workout-sync.ts` (paceOrSpeed, durationFromPaceOrSpeed,
+durationScaledByDistance, formatPace/parsePace/maskPace as m:ss) — unit-testable when tests
+resume. Targets stay a capped number row. Values driven via RHF `watch`/`setValue`. `SliderInput`
+keeps a **local editing buffer** while its field is focused (so partial typing isn't
+reformatted/clamped mid-keystroke) and takes an optional `mask` — pace uses `maskPace` to insert
+the `:` from digits typed on the numeric keypad (`530` → `5:30`), snapping to canonical on blur.
+
+Next Plans slice: intake tracking + food→timeline matching + per-hour scoring on the detail.

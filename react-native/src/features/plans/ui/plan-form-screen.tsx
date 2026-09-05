@@ -17,7 +17,26 @@ import {
 } from 'react-native-paper';
 import { z } from 'zod';
 
+import { SliderInput } from '@/core/widgets/slider-input';
 import { findPlan, savePlan } from '../data/plans-repository';
+import {
+  clamp,
+  durationFromPaceOrSpeed,
+  durationScaledByDistance,
+  formatPace,
+  maskPace,
+  paceOrSpeed,
+  parsePace,
+} from '../logic/workout-sync';
+
+const DUR_MIN = 30;
+const DUR_MAX = 600;
+
+function tomorrow(): Date {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  return d;
+}
 
 const schema = z.object({
   name: z.string().trim().min(1),
@@ -80,11 +99,12 @@ export function PlanFormScreen() {
   const [loaded, setLoaded] = useState(!isEditing);
   const [showDate, setShowDate] = useState(false);
 
-  const { control, handleSubmit, reset, formState } = useForm<PlanForm>({
+  const { control, handleSubmit, reset, formState, watch, setValue } =
+    useForm<PlanForm>({
     resolver: zodResolver(schema),
     defaultValues: {
-      name: '',
-      date: new Date(),
+      name: t('plans.defaultName'),
+      date: tomorrow(),
       activityType: 'run',
       distanceKm: 10,
       durationMinutes: 60,
@@ -130,6 +150,33 @@ export function PlanFormScreen() {
       comments: data.comments.trim() || null,
     });
     router.back();
+  };
+
+  // Distance is the anchor; editing it holds pace and rescales duration.
+  // Editing pace/speed or duration recomputes the other, staying consistent.
+  const distanceKm = watch('distanceKm');
+  const durationMinutes = watch('durationMinutes');
+  const activityType = watch('activityType');
+  const isRun = activityType === 'run';
+  const paceValue = paceOrSpeed(distanceKm, durationMinutes, activityType);
+
+  const onDistance = (d: number) => {
+    const dur = clamp(
+      durationScaledByDistance(distanceKm, durationMinutes, d),
+      DUR_MIN,
+      DUR_MAX,
+    );
+    setValue('distanceKm', d);
+    setValue('durationMinutes', Math.round(dur));
+  };
+  const onDuration = (dur: number) => setValue('durationMinutes', Math.round(dur));
+  const onPace = (v: number) => {
+    const dur = clamp(
+      durationFromPaceOrSpeed(distanceKm, v, activityType),
+      DUR_MIN,
+      DUR_MAX,
+    );
+    setValue('durationMinutes', Math.round(dur));
   };
 
   if (!loaded) {
@@ -215,21 +262,33 @@ export function PlanFormScreen() {
             )}
           />
 
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            <NumberField
-              control={control}
-              name="distanceKm"
-              label={t('plans.distance')}
-              max={100}
-            />
-            <NumberField
-              control={control}
-              name="durationMinutes"
-              label={t('plans.duration')}
-              decimals={false}
-              max={600}
-            />
-          </View>
+          <SliderInput
+            label={t('plans.distance')}
+            value={distanceKm}
+            min={5}
+            max={100}
+            step={1}
+            onChange={onDistance}
+          />
+          <SliderInput
+            label={t('plans.duration')}
+            value={durationMinutes}
+            min={DUR_MIN}
+            max={DUR_MAX}
+            step={5}
+            onChange={onDuration}
+          />
+          <SliderInput
+            label={isRun ? t('plans.pace') : t('plans.speed')}
+            value={paceValue}
+            min={isRun ? 3 : 10}
+            max={isRun ? 12 : 50}
+            step={isRun ? 5 / 60 : 1}
+            onChange={onPace}
+            format={isRun ? formatPace : undefined}
+            parse={isRun ? parsePace : undefined}
+            mask={isRun ? maskPace : undefined}
+          />
 
           <Text variant="titleMedium" style={{ marginTop: 8 }}>
             {t('plans.targetsPerHour')}
