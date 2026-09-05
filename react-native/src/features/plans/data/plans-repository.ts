@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import * as Crypto from 'expo-crypto';
 
 import { db } from '@/core/db/client';
@@ -7,6 +7,7 @@ import {
   plans,
   type ActivityType,
   type Plan,
+  type PlanItem,
   type PlanType,
 } from '@/core/db/schema';
 
@@ -117,6 +118,15 @@ export async function updateItem(args: {
       syncStatus: 'pending',
     })
     .where(eq(planItems.id, args.id));
+}
+
+/// One-shot read of a plan's non-deleted timeline items (not reactive; used to
+/// decide whether to seed suggestions when the timeline first mounts).
+export async function listItems(planId: string): Promise<PlanItem[]> {
+  return db
+    .select()
+    .from(planItems)
+    .where(and(eq(planItems.planId, planId), isNull(planItems.deletedAt)));
 }
 
 /// Soft delete a single timeline item.

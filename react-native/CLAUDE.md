@@ -118,9 +118,15 @@ renders when the plan has intake tracking set. Interval-seeded empty slots (loca
 pure `logic/timeline.ts` `seedSlots`/`occupies`) suggest fuel points; tapping one opens a Paper
 `Portal`+`Modal` food picker and persists a `PlanItem` at that offset (`saveItem`), consuming the
 slot. Placed tiles show name ×qty + nutrition scaled by servings, with delete (`deleteItem`, soft).
-"Add fuel point" appends a slot; the ✕ dismisses a suggestion. Slot seeding is derived not
-DB-persisted (so it never depends on `useLiveQuery`'s initial empty tick). Placed-item tap is a
-no-op until slice 3.
+"Add fuel point" appends a slot; the ✕ dismisses a suggestion. Suggestions are seeded **once at
+mount** from a one-shot `listItems` read (not `useLiveQuery`, to dodge its initial empty tick):
+seed the interval grid only if the plan has no items yet, else suggest nothing — matching Flutter's
+"respect your layout." Placing a food consumes its slot; other seeded suggestions stay for the
+session but never reappear on a later open.
 
-Remaining timeline slices (mirroring Flutter `plan_detail_screen.dart`): (3) item editor bottom
-sheet (fine-tune offset + servings); (4) per-hour score rollup vs. targets with progress bars.
+**Plans detail — item editor (slice 3)**: tapping a placed tile opens `ItemEditor` (a Paper
+`Portal`+`Modal` in `timeline-section.tsx`) with two `SliderInput`s — position (0..length, step
+0.5 km / 1 min) and servings (1..10) — saved via `updateItem`. Detail ScrollView pads
+`insets.bottom + 24` (`useSafeAreaInsets`) so the last control clears the Android nav bar.
+
+Remaining: (4) per-hour score rollup vs. targets with progress bars.
