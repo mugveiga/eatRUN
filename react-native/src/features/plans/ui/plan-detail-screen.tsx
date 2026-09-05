@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { usePlan } from '../data/use-plans';
 import { IntakeSection } from './intake-section';
+import { ScoreSection } from './score-section';
 import { TimelineSection } from './timeline-section';
 
 function Row({ label, value }: { label: string; value: string }) {
@@ -82,7 +83,12 @@ export function PlanDetailScreen() {
             </Card.Content>
           </Card>
           <IntakeSection plan={plan} />
-          {plan.planType && <TimelineSection plan={plan} />}
+          {plan.planType && (
+            <>
+              <TimelineSection plan={plan} />
+              <ScoreSection plan={plan} />
+            </>
+          )}
         </ScrollView>
       )}
     </View>

@@ -129,4 +129,12 @@ session but never reappear on a later open.
 0.5 km / 1 min) and servings (1..10) — saved via `updateItem`. Detail ScrollView pads
 `insets.bottom + 24` (`useSafeAreaInsets`) so the last control clears the Android nav bar.
 
-Remaining: (4) per-hour score rollup vs. targets with progress bars.
+**Plans detail — score (slice 4, completes Plans)**: `ScoreSection`
+(`features/plans/ui/score-section.tsx`) rolls placed foods into per-hour carbs/sodium/caffeine
+(pure `logic/score.ts` `perHourTotals` + `scoreRatio`) and shows each vs. its target as
+`actual / target` over a Paper `ProgressBar`. Reactive via `usePlanItems`/`useFoods`; rendered
+under the timeline once intake tracking is set.
+
+The Plans detail flow is now complete: summary + targets → intake config → timeline (add/edit/
+delete foods) → fueling score. Pure logic lives in `features/plans/logic/`
+(`workout-sync`, `timeline`, `score`) — all unit-testable when tests resume.

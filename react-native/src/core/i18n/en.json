@@ -53,6 +53,7 @@
     "distanceValue": "{{km}} km",
     "durationValue": "{{min}} min",
     "timeline": "Timeline",
+    "score": "Fueling score",
     "addFood": "Add food",
     "addIntakePoint": "Add fuel point",
     "positionDistance": "Position (km)",
