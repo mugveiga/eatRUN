@@ -63,3 +63,67 @@ export async function deletePlan(id: string): Promise<void> {
   await db.update(plans).set(gone).where(eq(plans.id, id));
   await db.update(planItems).set(gone).where(eq(planItems.planId, id));
 }
+
+/// Choose how a plan's intake is tracked (by distance or time) and the
+/// interval between suggested fuel points. Unlocks the timeline.
+export async function setIntakeTracking(args: {
+  id: string;
+  planType: PlanType;
+  interval: number;
+}): Promise<void> {
+  await db
+    .update(plans)
+    .set({
+      planType: args.planType,
+      intakeInterval: args.interval,
+      updatedAt: new Date(),
+      syncStatus: 'pending',
+    })
+    .where(eq(plans.id, args.id));
+}
+
+/// Place a food on a plan's timeline at an offset (km or min). Returns the id.
+export async function saveItem(args: {
+  planId: string;
+  foodId: string;
+  offsetLength: number;
+  quantity?: number;
+}): Promise<string> {
+  const id = Crypto.randomUUID();
+  await db.insert(planItems).values({
+    id,
+    planId: args.planId,
+    foodId: args.foodId,
+    offsetLength: args.offsetLength,
+    quantity: args.quantity ?? 1,
+    updatedAt: new Date(),
+    syncStatus: 'pending',
+  });
+  return id;
+}
+
+/// Fine-tune a placed item's position and servings.
+export async function updateItem(args: {
+  id: string;
+  offsetLength: number;
+  quantity: number;
+}): Promise<void> {
+  await db
+    .update(planItems)
+    .set({
+      offsetLength: args.offsetLength,
+      quantity: args.quantity,
+      updatedAt: new Date(),
+      syncStatus: 'pending',
+    })
+    .where(eq(planItems.id, args.id));
+}
+
+/// Soft delete a single timeline item.
+export async function deleteItem(id: string): Promise<void> {
+  const now = new Date();
+  await db
+    .update(planItems)
+    .set({ deletedAt: now, updatedAt: now, syncStatus: 'pending' })
+    .where(eq(planItems.id, id));
+}

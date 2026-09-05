@@ -106,4 +106,13 @@ keeps a **local editing buffer** while its field is focused (so partial typing i
 reformatted/clamped mid-keystroke) and takes an optional `mask` — pace uses `maskPace` to insert
 the `:` from digits typed on the numeric keypad (`530` → `5:30`), snapping to canonical on blur.
 
-Next Plans slice: intake tracking + food→timeline matching + per-hour scoring on the detail.
+**Plans detail — intake config (slice 1 of the timeline feature)**: repository gained
+`setIntakeTracking` + timeline-item CRUD (`saveItem`/`updateItem`/`deleteItem`), and
+`usePlanItems(planId)` (`useLiveQuery`, offset-ordered). `IntakeSection`
+(`features/plans/ui/intake-section.tsx`) on the detail screen picks **track by distance vs.
+time** + interval (SliderInput), persists via `setIntakeTracking`, then collapses to a summary
+with a Change button. This unlocks `planType`/`intakeInterval` for the timeline.
+
+Remaining timeline slices (mirroring Flutter `plan_detail_screen.dart`): (2) interval-seeded
+timeline with tap-to-add-food bottom sheet + placed tiles + delete; (3) item editor bottom sheet
+(fine-tune offset + servings); (4) per-hour score rollup vs. targets with progress bars.

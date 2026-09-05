@@ -4,6 +4,7 @@ import { ScrollView, View } from 'react-native';
 import { ActivityIndicator, Appbar, Card, Text } from 'react-native-paper';
 
 import { usePlan } from '../data/use-plans';
+import { IntakeSection } from './intake-section';
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
@@ -71,6 +72,7 @@ export function PlanDetailScreen() {
               />
             </Card.Content>
           </Card>
+          <IntakeSection plan={plan} />
         </ScrollView>
       )}
     </View>

@@ -6,7 +6,8 @@
   "common": {
     "save": "Save",
     "cancel": "Cancel",
-    "required": "Required"
+    "required": "Required",
+    "change": "Change"
   },
   "foods": {
     "empty": "No foods yet.\nAdd the gels, drinks and snacks you fuel with.",
@@ -49,6 +50,14 @@
     "sodium": "Sodium",
     "caffeine": "Caffeine",
     "comments": "Comments",
-    "distanceValue": "{{km}} km"
+    "distanceValue": "{{km}} km",
+    "intakeTracking": "Intake tracking",
+    "intakeQuestion": "How do you want to space your fueling?",
+    "intakeByDistance": "By distance",
+    "intakeByTime": "By time",
+    "intakeEveryKm": "Every {{n}} km",
+    "intakeEveryMin": "Every {{n}} min",
+    "intervalDistance": "Interval (km)",
+    "intervalDuration": "Interval (min)"
   }
 }
