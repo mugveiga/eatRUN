@@ -3,12 +3,21 @@
 An intra-workout fueling planner for runners and cyclists — plan *what* and *when* to eat and
 drink (carbs, sodium, caffeine per hour) and place each intake on a timeline.
 
+## Demo
+
+The React Native app running on Android — creating a food, planning a workout, and building the
+intake timeline with the per-hour fueling score:
+
+<video src="https://github.com/mugveiga/eatRUN/raw/main/docs/demo.mp4" controls width="320"></video>
+
+> If the player doesn't load, [watch the demo](docs/demo.mp4).
+
 This repository holds **two implementations** of the same app:
 
 | Directory | Stack | Notes |
 | --- | --- | --- |
 | [`flutter/`](flutter/) | Flutter + Dart, Riverpod, Drift | The original build. Foods + Plans (matching + scoring), offline-first. |
-| [`react-native/`](react-native/) | React Native + Expo, TypeScript, Drizzle + Expo SQLite, React Native Paper, Zustand | A re-implementation on a React Native stack. |
+| [`react-native/`](react-native/) | React Native + Expo, TypeScript, Drizzle + Expo SQLite, React Native Paper, Expo Router, react-hook-form + zod, i18next | A re-implementation on a React Native stack. |
 
 Each directory is a self-contained app with its own README and setup instructions.
 

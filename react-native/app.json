@@ -15,7 +15,11 @@
         "backgroundColor": "#FF5722",
         "foregroundImage": "./assets/images/android-icon-foreground.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.mugveigasteam.eatrun"
     },
     "web": {
       "output": "static",
@@ -45,6 +49,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "51a91a9a-dcfd-4453-ac12-bb1ba8dbe8fa"
+      }
+    },
+    "owner": "mugveigas-team"
   }
 }
