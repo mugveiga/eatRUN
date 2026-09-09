@@ -61,8 +61,15 @@ Build order **Desktop → Android → iOS**, features mirroring the RN app.
 1. ✅ **Runnable Desktop shell** — `App()` composable, JVM entry, Material 3, eatRUN branding.
 2. ✅ **Android target** — `androidTarget()`, `MainActivity` hosting the same `App()`, manifest,
    `local.properties` → `/Users/murilo/dev/sdk`. `assembleDebug` produces a debug APK.
-3. Room schema + driver (`expect`/`actual`) + Koin + a reactive Foods list.
-4. Foods feature (list + form), then Plans (form, timeline, score) — same slices as RN.
+3. ✅ **Data layer** — Room (`FoodEntity`/`FoodDao` with `Flow`, `AppDatabase` + generated
+   `AppDatabaseConstructor` via KSP), bundled SQLite driver, **Koin** with the `expect`/`actual`
+   `platformModule()` seam (Android supplies the builder with a `Context`, Desktop with a file
+   path), `FoodsRepository`, and a reactive Foods list screen (temporary "add sample" FAB).
+   Sync columns are shared via **`@Embedded val sync: SyncColumns`** (Room flattens them into each
+   table — the base-entity equivalent of the Flutter mixin / RN spread) plus a `Syncable`
+   interface for generic sync logic. `@PrimaryKey` on an embedded field → declare it as
+   `@Entity(primaryKeys = ["id"])`; the `sync` property needs `override` (satisfies `Syncable`).
+4. Foods form (ViewModel + validation, replaces the sample FAB), then Plans — same slices as RN.
 5. iOS target.
 6. **Showcase:** refactor the **food create/edit** screen to *shared logic + native UI* —
    Compose on Android/Desktop, **SwiftUI** on iOS, both bound to the shared ViewModel
@@ -71,10 +78,17 @@ Build order **Desktop → Android → iOS**, features mirroring the RN app.
 
 ## Status
 
-**Steps 1–2 complete:** shared Compose `App()` runs on **Desktop** (`:composeApp:run`) and builds
-an **Android** debug APK (`:composeApp:assembleDebug`). No DB/nav/DI yet — next slices.
-`android.useAndroidX=true` is required in `gradle.properties` (Compose pulls in AndroidX). Gradle
-wrapper committed; `build/`, `.gradle/`, `.kotlin/`, `local.properties` git-ignored.
+**Steps 1–3 complete.** Shared Compose `App()` runs on **Desktop** (`:composeApp:run`) and builds
+an **Android** APK (`:composeApp:assembleDebug`), both green. The **data layer** is wired: Room +
+bundled SQLite + Koin, with a reactive Foods list (DAO `Flow` → `collectAsState`) and a temporary
+"add sample" FAB proving the round-trip. Next: the real Foods form (slice 4), then Plans, then iOS,
+then the SwiftUI food-form showcase.
+
+Gotchas learned: `android.useAndroidX=true` is required (Compose pulls in AndroidX);
+`-Xexpect-actual-classes` compiler flag silences the Beta warning on the `expect object`
+constructor; Room KSP configs in a KMP module are `kspAndroid`/`kspJvm` (per-target). Gradle
+wrapper committed; `build/`, `.gradle/`, `.kotlin/`, `local.properties` git-ignored; `schemas/`
+committed.
 
 ## Commands (Android)
 

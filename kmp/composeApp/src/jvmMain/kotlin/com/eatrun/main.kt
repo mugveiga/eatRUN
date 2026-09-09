@@ -2,11 +2,14 @@ package com.eatrun
 
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import com.eatrun.core.di.initKoin
 
-/// Desktop (JVM) entry point. The Android and iOS entry points will call the
-/// same [App] composable from their own platform source sets.
-fun main() = application {
-    Window(onCloseRequest = ::exitApplication, title = "eatRUN") {
-        App()
+/// Desktop (JVM) entry point. Starts Koin once, then hosts the shared [App].
+fun main() {
+    initKoin()
+    application {
+        Window(onCloseRequest = ::exitApplication, title = "eatRUN") {
+            App()
+        }
     }
 }

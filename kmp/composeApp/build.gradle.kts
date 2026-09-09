@@ -6,9 +6,15 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.androidxRoom)
+    alias(libs.plugins.ksp)
 }
 
 kotlin {
+    compilerOptions {
+        // expect/actual classes (AppDatabaseConstructor) are stable enough for us.
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
@@ -23,9 +29,16 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
+            implementation(libs.room.runtime)
+            implementation(libs.sqlite.bundled)
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
+            implementation(libs.koin.android)
         }
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -48,6 +61,15 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
+dependencies {
+    add("kspAndroid", libs.room.compiler)
+    add("kspJvm", libs.room.compiler)
 }
 
 compose.desktop {
