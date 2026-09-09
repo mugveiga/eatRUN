@@ -59,7 +59,8 @@ where shared code meets platform code (SQLite driver, etc.).
 Build order **Desktop → Android → iOS**, features mirroring the RN app.
 
 1. ✅ **Runnable Desktop shell** — `App()` composable, JVM entry, Material 3, eatRUN branding.
-2. Android target (needs Android SDK — Studio is installed; confirm `~/Library/Android/sdk`).
+2. ✅ **Android target** — `androidTarget()`, `MainActivity` hosting the same `App()`, manifest,
+   `local.properties` → `/Users/murilo/dev/sdk`. `assembleDebug` produces a debug APK.
 3. Room schema + driver (`expect`/`actual`) + Koin + a reactive Foods list.
 4. Foods feature (list + form), then Plans (form, timeline, score) — same slices as RN.
 5. iOS target.
@@ -70,6 +71,15 @@ Build order **Desktop → Android → iOS**, features mirroring the RN app.
 
 ## Status
 
-**Step 1 complete:** Desktop Compose shell compiles and runs. No DB/nav/DI yet — those are the
-next slices. Gradle wrapper committed; `build/`, `.gradle/`, `.kotlin/`, `local.properties`
-git-ignored.
+**Steps 1–2 complete:** shared Compose `App()` runs on **Desktop** (`:composeApp:run`) and builds
+an **Android** debug APK (`:composeApp:assembleDebug`). No DB/nav/DI yet — next slices.
+`android.useAndroidX=true` is required in `gradle.properties` (Compose pulls in AndroidX). Gradle
+wrapper committed; `build/`, `.gradle/`, `.kotlin/`, `local.properties` git-ignored.
+
+## Commands (Android)
+
+```bash
+export ANDROID_HOME=/Users/murilo/dev/sdk    # not exported to non-interactive shells
+./gradlew :composeApp:assembleDebug          # build debug APK
+./gradlew :composeApp:installDebug           # install to a running emulator/device
+```
