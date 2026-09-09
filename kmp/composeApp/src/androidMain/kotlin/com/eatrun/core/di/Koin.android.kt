@@ -3,6 +3,8 @@ package com.eatrun.core.di
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.eatrun.core.db.AppDatabase
+import com.eatrun.core.storage.AndroidImageStore
+import com.eatrun.core.storage.ImageStore
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -18,4 +20,5 @@ actual fun platformModule(): Module = module {
             name = dbFile.absolutePath,
         )
     }
+    single<ImageStore> { AndroidImageStore(androidContext()) }
 }

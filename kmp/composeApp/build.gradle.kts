@@ -37,6 +37,8 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.navigation.compose)
             implementation(libs.lifecycle.viewmodel.compose)
+            implementation(libs.filekit.compose)
+            implementation(libs.coil.compose)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)

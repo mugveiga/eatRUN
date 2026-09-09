@@ -22,27 +22,53 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.eatrun.core.storage.ImageStore
 import com.eatrun.features.foods.data.FoodsRepository
+import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.core.PickerMode
+import io.github.vinceglb.filekit.core.PickerType
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 /// Create/edit a food. The repository is injected by Koin; the ViewModel is
 /// created (and scoped) by lifecycle's `viewModel { }` with the repo + id.
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalUuidApi::class)
 @Composable
 fun FoodFormScreen(foodId: String?, onDone: () -> Unit) {
     val repository: FoodsRepository = koinInject()
+    val imageStore: ImageStore = koinInject()
     val vm: FoodFormViewModel = viewModel(key = foodId ?: "new") {
         FoodFormViewModel(repository, foodId)
     }
     val state by vm.state.collectAsState()
+    val scope = rememberCoroutineScope()
+
+    // Pick an image, copy its bytes into app storage, then keep the stable path.
+    val picker = rememberFilePickerLauncher(
+        type = PickerType.Image,
+        mode = PickerMode.Single,
+    ) { file ->
+        if (file != null) {
+            scope.launch {
+                val path = imageStore.save(Uuid.random().toString(), file.readBytes())
+                vm.onPhoto(path)
+            }
+        }
+    }
 
     LaunchedEffect(state.done) {
         if (state.done) onDone()
@@ -75,6 +101,15 @@ fun FoodFormScreen(foodId: String?, onDone: () -> Unit) {
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                FoodImage(path = state.photoUri, modifier = Modifier.size(120.dp))
+                TextButton(onClick = { picker.launch() }) {
+                    Text(if (state.photoUri == null) "Add photo" else "Change photo")
+                }
+            }
             OutlinedTextField(
                 value = state.name,
                 onValueChange = vm::onName,

@@ -30,6 +30,7 @@ class FoodsRepository(private val dao: FoodDao) {
         sodiumMg: Int,
         caffeineMg: Int,
         notes: String,
+        photoUri: String?,
     ) {
         val existingSync = id?.let { dao.findById(it)?.sync }
         val sync = existingSync?.copy(updatedAt = now(), syncStatus = "pending")
@@ -38,6 +39,7 @@ class FoodsRepository(private val dao: FoodDao) {
             FoodEntity(
                 sync = sync,
                 name = name.trim(),
+                photoUri = photoUri,
                 carbsGrams = carbsGrams,
                 sodiumMg = sodiumMg,
                 caffeineMg = caffeineMg,

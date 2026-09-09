@@ -69,10 +69,13 @@ Build order **Desktop → Android → iOS**, features mirroring the RN app.
    table — the base-entity equivalent of the Flutter mixin / RN spread) plus a `Syncable`
    interface for generic sync logic. `@PrimaryKey` on an embedded field → declare it as
    `@Entity(primaryKeys = ["id"])`; the `sync` property needs `override` (satisfies `Syncable`).
-4. ✅ **Foods form + navigation** — Navigation Compose (`NavHost`, list ↔ `food_form?foodId=`),
-   shared `FoodFormViewModel` (`androidx.lifecycle.ViewModel` + `StateFlow`, validation), created
-   by lifecycle's `viewModel { }` with the Koin-injected repository. `FoodsRepository.find`/`save`
-   added; list rows are tap-to-edit; FAB opens create.
+4. ✅ **Foods feature complete** — Navigation Compose (`NavHost`, list ↔ `food_form?foodId=`),
+   shared `FoodFormViewModel` (`androidx.lifecycle.ViewModel` + `StateFlow`, validation + max
+   caps), created by lifecycle's `viewModel { }` with the Koin-injected repository. List rows
+   tap-to-edit; FAB opens create; delete lives in the edit toolbar. Light/dark via
+   `core/theme/Theme.kt`. **Photo**: FileKit picker → bytes copied into app storage via the
+   `ImageStore` seam (androidMain/jvmMain impls, bound in `platformModule`) → path stored in
+   `photoUri`, displayed by Coil 3 (`FoodImage`, `okio.Path` model) on the list + form.
 5. Plans — form, timeline, score (same slices as RN).
 6. iOS target.
 6. **Showcase:** refactor the **food create/edit** screen to *shared logic + native UI* —
@@ -93,6 +96,11 @@ showcase.
 Version note: nav/lifecycle multiplatform are pinned to the **Compose MP 1.7 line** —
 navigation-compose `2.8.0-alpha13`, lifecycle-viewmodel-compose `2.8.4`. The newer stable tags
 (nav 2.9+, lifecycle 2.11) require Compose MP 1.8+; bump together if CMP is upgraded.
+
+Image stack pinned to the 1.7-safe line to avoid bumping Compose: **FileKit `filekit-compose:0.8.8`**
+(picker), **Coil `coil3:coil-compose:3.0.4`** (display). Newer FileKit (0.16) / Coil (3.6) are
+Compose-1.8-era. Picked bytes are copied into app storage (`ImageStore`) rather than storing the
+raw picker URI, so images survive restart on all platforms.
 
 **Skiko split-version gotcha (Desktop):** the nav/lifecycle alphas drag `skiko-awt` up to 0.8.25
 while Compose 1.7.3's desktop **native** runtime stays 0.8.18 → `UnsatisfiedLinkError`

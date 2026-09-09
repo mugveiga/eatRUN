@@ -3,6 +3,8 @@ package com.eatrun.core.di
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.eatrun.core.db.AppDatabase
+import com.eatrun.core.storage.DesktopImageStore
+import com.eatrun.core.storage.ImageStore
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import java.io.File
@@ -15,4 +17,5 @@ actual fun platformModule(): Module = module {
         val dbFile = File(dir, "eatrun.db")
         Room.databaseBuilder<AppDatabase>(name = dbFile.absolutePath)
     }
+    single<ImageStore> { DesktopImageStore() }
 }

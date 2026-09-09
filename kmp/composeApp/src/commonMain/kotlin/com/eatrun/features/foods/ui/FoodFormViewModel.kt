@@ -17,6 +17,7 @@ data class FoodFormState(
     val sodium: String = "",
     val caffeine: String = "",
     val notes: String = "",
+    val photoUri: String? = null,
     val nameError: Boolean = false,
     val loading: Boolean = false,
     val done: Boolean = false,
@@ -54,6 +55,7 @@ class FoodFormViewModel(
                             sodium = food.sodiumMg.toString(),
                             caffeine = food.caffeineMg.toString(),
                             notes = food.notes ?: "",
+                            photoUri = food.photoUri,
                             loading = false,
                         )
                     }
@@ -67,6 +69,7 @@ class FoodFormViewModel(
     fun onSodium(v: String) = _state.update { it.copy(sodium = capDigits(v, MAX_SODIUM)) }
     fun onCaffeine(v: String) = _state.update { it.copy(caffeine = capDigits(v, MAX_CAFFEINE)) }
     fun onNotes(v: String) = _state.update { it.copy(notes = v) }
+    fun onPhoto(path: String) = _state.update { it.copy(photoUri = path) }
 
     /// Keep only digits, then clamp to the field's max (empty stays empty).
     private fun capDigits(v: String, max: Int): String {
@@ -96,6 +99,7 @@ class FoodFormViewModel(
                 sodiumMg = s.sodium.toIntOrNull() ?: 0,
                 caffeineMg = s.caffeine.toIntOrNull() ?: 0,
                 notes = s.notes,
+                photoUri = s.photoUri,
             )
             _state.update { it.copy(done = true) }
         }
