@@ -69,8 +69,12 @@ Build order **Desktop → Android → iOS**, features mirroring the RN app.
    table — the base-entity equivalent of the Flutter mixin / RN spread) plus a `Syncable`
    interface for generic sync logic. `@PrimaryKey` on an embedded field → declare it as
    `@Entity(primaryKeys = ["id"])`; the `sync` property needs `override` (satisfies `Syncable`).
-4. Foods form (ViewModel + validation, replaces the sample FAB), then Plans — same slices as RN.
-5. iOS target.
+4. ✅ **Foods form + navigation** — Navigation Compose (`NavHost`, list ↔ `food_form?foodId=`),
+   shared `FoodFormViewModel` (`androidx.lifecycle.ViewModel` + `StateFlow`, validation), created
+   by lifecycle's `viewModel { }` with the Koin-injected repository. `FoodsRepository.find`/`save`
+   added; list rows are tap-to-edit; FAB opens create.
+5. Plans — form, timeline, score (same slices as RN).
+6. iOS target.
 6. **Showcase:** refactor the **food create/edit** screen to *shared logic + native UI* —
    Compose on Android/Desktop, **SwiftUI** on iOS, both bound to the shared ViewModel
    (bridging `StateFlow` → SwiftUI via SKIE or a Flow wrapper). The one screen that demonstrates
@@ -78,11 +82,28 @@ Build order **Desktop → Android → iOS**, features mirroring the RN app.
 
 ## Status
 
-**Steps 1–3 complete.** Shared Compose `App()` runs on **Desktop** (`:composeApp:run`) and builds
-an **Android** APK (`:composeApp:assembleDebug`), both green. The **data layer** is wired: Room +
-bundled SQLite + Koin, with a reactive Foods list (DAO `Flow` → `collectAsState`) and a temporary
-"add sample" FAB proving the round-trip. Next: the real Foods form (slice 4), then Plans, then iOS,
-then the SwiftUI food-form showcase.
+**Steps 1–4 complete.** Shared Compose `App()` runs on **Desktop** (`:composeApp:run`) and builds
+an **Android** APK (`:composeApp:assembleDebug`), both green. Data layer: Room + bundled SQLite +
+Koin. **Foods feature done**: reactive list (DAO `Flow` → `collectAsState`), create/edit form via
+Navigation Compose + a shared `FoodFormViewModel` (`androidx.lifecycle.ViewModel` + `StateFlow`,
+validation), ViewModel built by lifecycle's `viewModel { }` with a Koin-injected repository (no
+`koin-compose-viewmodel` needed). Next: Plans (slice 5), then iOS, then the SwiftUI food-form
+showcase.
+
+Version note: nav/lifecycle multiplatform are pinned to the **Compose MP 1.7 line** —
+navigation-compose `2.8.0-alpha13`, lifecycle-viewmodel-compose `2.8.4`. The newer stable tags
+(nav 2.9+, lifecycle 2.11) require Compose MP 1.8+; bump together if CMP is upgraded.
+
+**Skiko split-version gotcha (Desktop):** the nav/lifecycle alphas drag `skiko-awt` up to 0.8.25
+while Compose 1.7.3's desktop **native** runtime stays 0.8.18 → `UnsatisfiedLinkError`
+(`RenderNodeContext_nMake`) at `:composeApp:run`. Fixed by forcing every `org.jetbrains.skiko`
+artifact to one version via `resolutionStrategy` in `composeApp/build.gradle.kts`. Re-check the
+pin if Compose/nav/lifecycle versions change.
+
+**Theme:** light/dark follow the system (`isSystemInDarkTheme()` → `LightColors`/`DarkColors` in
+`core/theme/Theme.kt`). This also fixes the Android status bar (was white-on-white when the app was
+forced light under a dark system); with `enableEdgeToEdge()` the bar icons auto-match the system,
+now consistent with the app theme.
 
 Gotchas learned: `android.useAndroidX=true` is required (Compose pulls in AndroidX);
 `-Xexpect-actual-classes` compiler flag silences the Beta warning on the `expect object`

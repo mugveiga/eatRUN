@@ -15,25 +15,36 @@ class FoodsRepository(private val dao: FoodDao) {
 
     fun observeFoods(): Flow<List<FoodEntity>> = dao.observeFoods()
 
+    suspend fun find(id: String): FoodEntity? = dao.findById(id)
+
     suspend fun softDelete(id: String) {
-        dao.softDelete(id, Clock.System.now().toEpochMilliseconds())
+        dao.softDelete(id, now())
     }
 
-    /// Temporary — proves the reactive round-trip end to end. Replaced by the
-    /// real Foods form in the next slice.
-    suspend fun addSample() {
-        val n = (1..99).random()
+    /// Create (id null) or update a food. On update we keep the existing sync
+    /// row but re-stamp it pending, so a later backend re-syncs the change.
+    suspend fun save(
+        id: String?,
+        name: String,
+        carbsGrams: Int,
+        sodiumMg: Int,
+        caffeineMg: Int,
+        notes: String,
+    ) {
+        val existingSync = id?.let { dao.findById(it)?.sync }
+        val sync = existingSync?.copy(updatedAt = now(), syncStatus = "pending")
+            ?: SyncColumns(id = Uuid.random().toString(), updatedAt = now())
         dao.upsert(
             FoodEntity(
-                sync = SyncColumns(
-                    id = Uuid.random().toString(),
-                    updatedAt = Clock.System.now().toEpochMilliseconds(),
-                ),
-                name = "Sample gel $n",
-                carbsGrams = 25,
-                sodiumMg = 50,
-                caffeineMg = if (n % 2 == 0) 30 else 0,
+                sync = sync,
+                name = name.trim(),
+                carbsGrams = carbsGrams,
+                sodiumMg = sodiumMg,
+                caffeineMg = caffeineMg,
+                notes = notes.ifBlank { null },
             ),
         )
     }
+
+    private fun now(): Long = Clock.System.now().toEpochMilliseconds()
 }

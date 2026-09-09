@@ -35,6 +35,8 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
+            implementation(libs.navigation.compose)
+            implementation(libs.lifecycle.viewmodel.compose)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
@@ -60,6 +62,17 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+// Navigation/lifecycle alphas drag skiko-awt up to 0.8.25 while the desktop
+// native runtime stays at 0.8.18 (Compose 1.7.3) — the split causes an
+// UnsatisfiedLinkError at Desktop startup. Pin every skiko artifact together.
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.jetbrains.skiko") {
+            useVersion("0.8.25")
+        }
     }
 }
 

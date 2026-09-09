@@ -13,6 +13,9 @@ interface FoodDao {
     @Query("SELECT * FROM foods WHERE deletedAt IS NULL ORDER BY name")
     fun observeFoods(): Flow<List<FoodEntity>>
 
+    @Query("SELECT * FROM foods WHERE id = :id LIMIT 1")
+    suspend fun findById(id: String): FoodEntity?
+
     @Upsert
     suspend fun upsert(food: FoodEntity)
 
