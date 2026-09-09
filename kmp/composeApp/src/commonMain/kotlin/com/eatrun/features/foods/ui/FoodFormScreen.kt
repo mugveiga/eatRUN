@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -21,10 +23,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -32,11 +34,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.eatrun.core.storage.ImageStore
 import com.eatrun.features.foods.data.FoodsRepository
+import com.eatrun.resources.Res
+import com.eatrun.resources.action_add_photo
+import com.eatrun.resources.action_cancel
+import com.eatrun.resources.action_change_photo
+import com.eatrun.resources.action_delete
+import com.eatrun.resources.action_enter_as_salt
+import com.eatrun.resources.action_enter_as_sodium
+import com.eatrun.resources.action_save
+import com.eatrun.resources.field_caffeine
+import com.eatrun.resources.field_carbs
+import com.eatrun.resources.field_name
+import com.eatrun.resources.field_notes
+import com.eatrun.resources.field_required
+import com.eatrun.resources.field_salt
+import com.eatrun.resources.field_sodium
+import com.eatrun.resources.food_edit_title
+import com.eatrun.resources.food_new_title
+import com.eatrun.resources.unit_g
+import com.eatrun.resources.unit_mg
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
+import org.jetbrains.compose.resources.stringResource
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.launch
@@ -44,11 +65,11 @@ import org.koin.compose.koinInject
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-/// Create/edit a food. The repository is injected by Koin; the ViewModel is
-/// created (and scoped) by lifecycle's `viewModel { }` with the repo + id.
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalUuidApi::class)
+/// Route: owns the ViewModel + DI + the image-picker side effect, and hands the
+/// stateless [FoodFormScreen] an immutable state plus event callbacks.
+@OptIn(ExperimentalUuidApi::class)
 @Composable
-fun FoodFormScreen(foodId: String?, onDone: () -> Unit) {
+fun FoodFormRoute(foodId: String?, onDone: () -> Unit) {
     val repository: FoodsRepository = koinInject()
     val imageStore: ImageStore = koinInject()
     val vm: FoodFormViewModel = viewModel(key = foodId ?: "new") {
@@ -56,6 +77,10 @@ fun FoodFormScreen(foodId: String?, onDone: () -> Unit) {
     }
     val state by vm.state.collectAsState()
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(state.done) {
+        if (state.done) onDone()
+    }
 
     // Pick an image, copy its bytes into app storage, then keep the stable path.
     val picker = rememberFilePickerLauncher(
@@ -70,23 +95,54 @@ fun FoodFormScreen(foodId: String?, onDone: () -> Unit) {
         }
     }
 
-    LaunchedEffect(state.done) {
-        if (state.done) onDone()
-    }
+    FoodFormScreen(
+        state = state,
+        isEditing = foodId != null,
+        onName = vm::onName,
+        onCarbs = vm::onCarbs,
+        onSodium = vm::onSodium,
+        onToggleSalt = vm::toggleSalt,
+        onCaffeine = vm::onCaffeine,
+        onNotes = vm::onNotes,
+        onPickPhoto = { picker.launch() },
+        onSave = vm::save,
+        onDelete = vm::delete,
+        onBack = onDone,
+    )
+}
 
+/// Stateless: pure function of [state] with events out. No DI, no VM, no I/O.
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FoodFormScreen(
+    state: FoodFormState,
+    isEditing: Boolean,
+    onName: (String) -> Unit,
+    onCarbs: (String) -> Unit,
+    onSodium: (String) -> Unit,
+    onToggleSalt: () -> Unit,
+    onCaffeine: (String) -> Unit,
+    onNotes: (String) -> Unit,
+    onPickPhoto: () -> Unit,
+    onSave: () -> Unit,
+    onDelete: () -> Unit,
+    onBack: () -> Unit,
+) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (foodId == null) "New food" else "Edit food") },
+                title = {
+                    Text(stringResource(if (isEditing) Res.string.food_edit_title else Res.string.food_new_title))
+                },
                 navigationIcon = {
-                    IconButton(onClick = onDone) {
-                        Icon(Icons.Filled.Close, contentDescription = "Cancel")
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Filled.Close, contentDescription = stringResource(Res.string.action_cancel))
                     }
                 },
                 actions = {
-                    if (foodId != null) {
-                        IconButton(onClick = vm::delete) {
-                            Icon(Icons.Filled.Delete, contentDescription = "Delete")
+                    if (isEditing) {
+                        IconButton(onClick = onDelete) {
+                            Icon(Icons.Filled.Delete, contentDescription = stringResource(Res.string.action_delete))
                         }
                     }
                 },
@@ -97,8 +153,9 @@ fun FoodFormScreen(foodId: String?, onDone: () -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
+                .imePadding()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Column(
@@ -106,55 +163,67 @@ fun FoodFormScreen(foodId: String?, onDone: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 FoodImage(path = state.photoUri, modifier = Modifier.size(120.dp))
-                TextButton(onClick = { picker.launch() }) {
-                    Text(if (state.photoUri == null) "Add photo" else "Change photo")
+                TextButton(onClick = onPickPhoto) {
+                    Text(
+                        stringResource(
+                            if (state.photoUri == null) Res.string.action_add_photo
+                            else Res.string.action_change_photo,
+                        ),
+                    )
                 }
             }
+
             OutlinedTextField(
                 value = state.name,
-                onValueChange = vm::onName,
-                label = { Text("Name") },
+                onValueChange = onName,
+                label = { Text(stringResource(Res.string.field_name)) },
                 isError = state.nameError,
-                supportingText = if (state.nameError) {
-                    { Text("Required", color = MaterialTheme.colorScheme.error) }
-                } else null,
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                NumberField(
-                    label = "Carbs",
-                    value = state.carbs,
-                    onChange = vm::onCarbs,
-                    unit = "g",
-                    max = FoodFormViewModel.MAX_CARBS,
-                    modifier = Modifier.weight(1f),
-                )
-                NumberField(
-                    label = "Sodium",
-                    value = state.sodium,
-                    onChange = vm::onSodium,
-                    unit = "mg",
-                    max = FoodFormViewModel.MAX_SODIUM,
-                    modifier = Modifier.weight(1f),
-                )
-                NumberField(
-                    label = "Caffeine",
-                    value = state.caffeine,
-                    onChange = vm::onCaffeine,
-                    unit = "mg",
-                    max = FoodFormViewModel.MAX_CAFFEINE,
-                    modifier = Modifier.weight(1f),
+            if (state.nameError) {
+                Text(
+                    text = stringResource(Res.string.field_required),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
                 )
             }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                NumberField(
+                    stringResource(Res.string.field_carbs), state.carbs, onCarbs,
+                    stringResource(Res.string.unit_g), Modifier.weight(1f),
+                )
+                NumberField(
+                    label = stringResource(if (state.saltMode) Res.string.field_salt else Res.string.field_sodium),
+                    value = state.sodium,
+                    onChange = onSodium,
+                    unit = stringResource(if (state.saltMode) Res.string.unit_g else Res.string.unit_mg),
+                    modifier = Modifier.weight(1f),
+                    decimal = state.saltMode,
+                )
+                NumberField(
+                    stringResource(Res.string.field_caffeine), state.caffeine, onCaffeine,
+                    stringResource(Res.string.unit_mg), Modifier.weight(1f),
+                )
+            }
+            TextButton(onClick = onToggleSalt) {
+                Text(
+                    stringResource(
+                        if (state.saltMode) Res.string.action_enter_as_sodium
+                        else Res.string.action_enter_as_salt,
+                    ),
+                )
+            }
+
             OutlinedTextField(
                 value = state.notes,
-                onValueChange = vm::onNotes,
-                label = { Text("Notes") },
+                onValueChange = onNotes,
+                label = { Text(stringResource(Res.string.field_notes)) },
                 modifier = Modifier.fillMaxWidth().height(120.dp),
             )
-            Button(onClick = vm::save, modifier = Modifier.fillMaxWidth()) {
-                Text("Save")
+            Button(onClick = onSave, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(Res.string.action_save))
             }
         }
     }
@@ -166,8 +235,8 @@ private fun NumberField(
     value: String,
     onChange: (String) -> Unit,
     unit: String,
-    max: Int,
     modifier: Modifier,
+    decimal: Boolean = false,
 ) {
     OutlinedTextField(
         value = value,
@@ -175,9 +244,9 @@ private fun NumberField(
         label = { Text(label) },
         suffix = { Text(unit) },
         singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        // A supporting line on every field keeps the three the same height.
-        supportingText = { Text("max $max") },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = if (decimal) KeyboardType.Decimal else KeyboardType.Number,
+        ),
         modifier = modifier,
     )
 }

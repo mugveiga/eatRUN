@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.androidxRoom)
     alias(libs.plugins.ksp)
 }
@@ -39,6 +40,7 @@ kotlin {
             implementation(libs.lifecycle.viewmodel.compose)
             implementation(libs.filekit.compose)
             implementation(libs.coil.compose)
+            implementation(libs.kotlinx.serialization.core)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
@@ -46,6 +48,7 @@ kotlin {
         }
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
+            implementation(libs.kotlinx.coroutines.swing)
         }
     }
 }
@@ -76,6 +79,11 @@ configurations.all {
             useVersion("0.8.25")
         }
     }
+}
+
+compose.resources {
+    publicResClass = true
+    packageOfResClass = "com.eatrun.resources"
 }
 
 room {

@@ -1,0 +1,26 @@
+<resources>
+    <string name="foods_title">eatRUN · Foods</string>
+    <string name="foods_empty">No foods yet — tap + to add one</string>
+    <string name="action_add_food">Add food</string>
+    <string name="nutrition_summary">%1$dg carbs · %2$dmg sodium · %3$dmg caffeine</string>
+
+    <string name="food_new_title">New food</string>
+    <string name="food_edit_title">Edit food</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_save">Save</string>
+    <string name="action_add_photo">Add photo</string>
+    <string name="action_change_photo">Change photo</string>
+
+    <string name="field_name">Name</string>
+    <string name="field_required">Required</string>
+    <string name="field_carbs">Carbs</string>
+    <string name="field_sodium">Sodium</string>
+    <string name="field_salt">Salt</string>
+    <string name="action_enter_as_salt">Enter as salt (g)</string>
+    <string name="action_enter_as_sodium">Enter as sodium (mg)</string>
+    <string name="field_caffeine">Caffeine</string>
+    <string name="field_notes">Notes</string>
+    <string name="unit_g">g</string>
+    <string name="unit_mg">mg</string>
+</resources>

@@ -54,6 +54,26 @@ kmp/
 `expect fun createRoomDatabase(): AppDatabase`) with a per-platform `actual`. This is the seam
 where shared code meets platform code (SQLite driver, etc.).
 
+**UI pattern — MVVM + UDF + immutable state.** Every screen is a public **Route** + a private
+stateless **Screen**:
+- *Route* (`FoodsListRoute`, `FoodFormRoute`) owns the `ViewModel` (via lifecycle `viewModel { }`),
+  Koin injection, and side effects (image picker). It observes state and passes it down.
+- *Screen* is a pure function of an **immutable state** (`data class`, `copy`) plus event
+  callbacks out — no DI, no VM, no I/O. Easy to preview/test.
+- *ViewModel* exposes `StateFlow` (state down); UI calls VM functions (events up). State is
+  always an immutable data class or an immutable list.
+
+**Navigation is type-safe:** `@Serializable` route types (`FoodsList`, `FoodForm(foodId)`) with
+`composable<T>` + `entry.toRoute<T>()`, not string paths (needs the kotlin-serialization plugin).
+Route types must **not be `private`** — serialization reads a route object's `INSTANCE` field
+reflectively, which throws `IllegalAccessException` on a package-private type. Use `internal`.
+
+**Strings** are externalized via **Compose Resources**: `commonMain/composeResources/values/strings.xml`
+→ generated `Res` class in package `com.eatrun.resources` (set in `build.gradle.kts`
+`compose.resources { publicResClass = true; packageOfResClass = "com.eatrun.resources" }`). Use
+`stringResource(Res.string.<id>)`; format args like `nutrition_summary` use `%1$d` positional
+specifiers. Add a locale by dropping in `values-<lang>/strings.xml`.
+
 ## Plan (small steps)
 
 Build order **Desktop → Android → iOS**, features mirroring the RN app.
@@ -76,8 +96,14 @@ Build order **Desktop → Android → iOS**, features mirroring the RN app.
    `core/theme/Theme.kt`. **Photo**: FileKit picker → bytes copied into app storage via the
    `ImageStore` seam (androidMain/jvmMain impls, bound in `platformModule`) → path stored in
    `photoUri`, displayed by Coil 3 (`FoodImage`, `okio.Path` model) on the list + form.
-5. Plans — form, timeline, score (same slices as RN).
-6. iOS target.
+5. ✅ **Strings externalized** — Compose Resources (`strings.xml` → `Res.string.*`); screens
+   refactored to Route + stateless Screen; type-safe nav routes; list delete removed (edit-only).
+   **Salt↔sodium swap** on the form: pure `features/foods/logic/Sodium.kt` (1 g salt ≈ 400 mg
+   sodium, `saltToSodiumMg`/`sodiumMgToSalt`/`formatSalt`, MAX 25 g / 10000 mg); VM holds a
+   `saltMode` flag, `toggleSalt()` converts the field so stored sodium never changes, save
+   normalizes back to mg. Sodium field is decimal in salt mode.
+6. Plans — form, timeline, score (same slices as RN).
+7. iOS target.
 6. **Showcase:** refactor the **food create/edit** screen to *shared logic + native UI* —
    Compose on Android/Desktop, **SwiftUI** on iOS, both bound to the shared ViewModel
    (bridging `StateFlow` → SwiftUI via SKIE or a Flow wrapper). The one screen that demonstrates
@@ -101,6 +127,10 @@ Image stack pinned to the 1.7-safe line to avoid bumping Compose: **FileKit `fil
 (picker), **Coil `coil3:coil-compose:3.0.4`** (display). Newer FileKit (0.16) / Coil (3.6) are
 Compose-1.8-era. Picked bytes are copied into app storage (`ImageStore`) rather than storing the
 raw picker URI, so images survive restart on all platforms.
+
+**Desktop `Main` dispatcher:** `viewModelScope` uses `Dispatchers.Main`, which the JVM lacks by
+default → "Module with the Main dispatcher is missing" when a VM coroutine runs (e.g. save). Fixed
+by `kotlinx-coroutines-swing` in `jvmMain` (provides Main = Swing EDT).
 
 **Skiko split-version gotcha (Desktop):** the nav/lifecycle alphas drag `skiko-awt` up to 0.8.25
 while Compose 1.7.3's desktop **native** runtime stays 0.8.18 → `UnsatisfiedLinkError`
